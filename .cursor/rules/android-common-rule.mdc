@@ -1,0 +1,19 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# 编码要求
+
+- 使用Android推荐的MVVM框架, 使用Jetpack现代库
+- UI部分使用compose编写
+- 使用协程, flow做状态同步和管理
+- 代码尽量简洁易懂, 具有合理的拆分和耦合
+- 可以使用hilt做依赖注入
+- 合理添加注释, 方便理解代码
+- 一些没有必要改动的地方就不要反覆修改
+
+# 关于readme
+
+项目中一边都有README.md文件, 每次编码钱都阅读一下readme, 方便你了解当前项目的情况
+你可以在readme中添加一些记录, 方便你后面继续分析解决问题.
