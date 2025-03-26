@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.aidaole.infuseandroid.ui.screens.servers.ServersScreen
 
 sealed class Screen(val route: String) {
     object Home : Screen("home")
@@ -57,11 +58,6 @@ fun InfuseNavHost(
 @Composable
 fun HomeScreen(navController: NavHostController) {
     // TODO: 实现首页
-}
-
-@Composable
-fun ServersScreen(navController: NavHostController) {
-    // TODO: 实现服务器管理页面
 }
 
 @Composable
