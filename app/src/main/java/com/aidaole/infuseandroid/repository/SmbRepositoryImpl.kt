@@ -5,8 +5,10 @@ import com.aidaole.infuseandroid.domain.repository.SmbRepository
 import com.hierynomus.smbj.SMBClient
 import com.hierynomus.smbj.auth.AuthenticationContext
 import com.hierynomus.smbj.connection.Connection
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
@@ -30,8 +32,8 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
         disconnectFromServer(serverId)
     }
 
-    override suspend fun connectToServer(server: SmbServer): Boolean {
-        return try {
+    override suspend fun connectToServer(server: SmbServer): Boolean = withContext(Dispatchers.IO) {
+        try {
             val client = SMBClient()
             val authContext = AuthenticationContext(server.username, server.password.toCharArray(), server.host)
             val connection = client.connect(server.host)

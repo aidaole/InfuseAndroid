@@ -16,10 +16,10 @@ fun SmbServiceScreen(
     viewModel: SmbServiceViewModel = hiltViewModel()
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
-    var name by remember { mutableStateOf("") }
-    var host by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("mac") }
+    var host by remember { mutableStateOf("192.168.31.191") }
+    var username by remember { mutableStateOf("yxm") }
+    var password by remember { mutableStateOf("xiao") }
 
     val uiState by viewModel.uiState.collectAsState()
     val servers by viewModel.servers.collectAsState()
