@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.aidaole.infuseandroid.smb.SmbServiceScreen
+import com.aidaole.infuseandroid.ui.screen.smb.SmbServiceScreen
 import com.aidaole.infuseandroid.ui.theme.InfuseAndroidTheme
 import dagger.hilt.android.AndroidEntryPoint
 

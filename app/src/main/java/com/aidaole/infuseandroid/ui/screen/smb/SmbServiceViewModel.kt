@@ -1,7 +1,8 @@
-package com.aidaole.infuseandroid.smb
+package com.aidaole.infuseandroid.ui.screen.smb
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aidaole.infuseandroid.domain.model.FileItem
 import com.aidaole.infuseandroid.domain.model.SmbServer
 import com.aidaole.infuseandroid.domain.repository.SmbRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,6 +23,12 @@ class SmbServiceViewModel @Inject constructor(
 
     private val _servers = MutableStateFlow<List<SmbServer>>(emptyList())
     val servers: StateFlow<List<SmbServer>> = _servers.asStateFlow()
+
+    private val _currentPath = MutableStateFlow<String>("")
+    val currentPath: StateFlow<String> = _currentPath.asStateFlow()
+
+    private val _files = MutableStateFlow<List<FileItem>>(emptyList())
+    val files: StateFlow<List<FileItem>> = _files.asStateFlow()
 
     init {
         loadServers()
@@ -63,10 +70,12 @@ class SmbServiceViewModel @Inject constructor(
             _uiState.value = SmbServiceUiState.Loading
             try {
                 val success = repository.connectToServer(server)
-                _uiState.value = if (success) {
-                    SmbServiceUiState.Success
+                if (success) {
+                    _uiState.value = SmbServiceUiState.Success
+                    // 连接成功后自动扫描根目录
+                    scanDirectory(server.id, "/")
                 } else {
-                    SmbServiceUiState.Error("Failed to connect to server")
+                    _uiState.value = SmbServiceUiState.Error("Failed to connect to server")
                 }
             } catch (e: Exception) {
                 _uiState.value = SmbServiceUiState.Error(e.message ?: "Failed to connect to server")
@@ -83,6 +92,26 @@ class SmbServiceViewModel @Inject constructor(
             } catch (e: Exception) {
                 _uiState.value = SmbServiceUiState.Error(e.message ?: "Failed to remove server")
             }
+        }
+    }
+
+    private fun scanDirectory(serverId: String, path: String) {
+        viewModelScope.launch {
+            _uiState.value = SmbServiceUiState.Loading
+            try {
+                val items = repository.scanDirectory(serverId, path)
+                _files.value = items
+                _currentPath.value = path
+                _uiState.value = SmbServiceUiState.Success
+            } catch (e: Exception) {
+                _uiState.value = SmbServiceUiState.Error(e.message ?: "Failed to scan directory")
+            }
+        }
+    }
+
+    fun navigateToDirectory(serverId: String, path: String) {
+        viewModelScope.launch {
+            scanDirectory(serverId, path)
         }
     }
 }
