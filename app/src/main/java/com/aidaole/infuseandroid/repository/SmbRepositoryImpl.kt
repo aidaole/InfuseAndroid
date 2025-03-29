@@ -1,6 +1,9 @@
 package com.aidaole.infuseandroid.repository
 
-import android.util.Log
+
+import com.aidaole.infuseandroid.data.dao.SmbServerDao
+import com.aidaole.infuseandroid.data.entity.toDomain
+import com.aidaole.infuseandroid.data.entity.toEntity
 import com.aidaole.infuseandroid.domain.model.FileItem
 import com.aidaole.infuseandroid.domain.model.SmbServer
 import com.aidaole.infuseandroid.domain.repository.SmbRepository
@@ -11,35 +14,32 @@ import jcifs.smb.NtlmPasswordAuthentication
 import jcifs.smb.SmbFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
-
-class SmbRepositoryImpl @Inject constructor() : SmbRepository {
+class SmbRepositoryImpl @Inject constructor(
+    private val smbServerDao: SmbServerDao
+) : SmbRepository {
     companion object {
         private const val TAG = "SmbRepositoryImpl"
     }
 
-    private val servers = MutableStateFlow<List<SmbServer>>(
-        listOf(SmbServer("1", "mac", "192.168.31.191", "yxm", "xiao", false))
-    )
     private val connections = mutableMapOf<String, CIFSContext>()
 
-    override fun getServers(): Flow<List<SmbServer>> = servers
+    override fun getServers(): Flow<List<SmbServer>> =
+        smbServerDao.getAllServers().map { entities ->
+            entities.map { it.toDomain() }
+        }
 
     override suspend fun addServer(server: SmbServer) {
-        val currentList = servers.value.toMutableList()
         val newServer = server.copy(id = UUID.randomUUID().toString())
-        currentList.add(newServer)
-        servers.value = currentList
+        smbServerDao.insertServer(newServer.toEntity())
     }
 
     override suspend fun removeServer(serverId: String) {
-        val currentList = servers.value.toMutableList()
-        currentList.removeAll { it.id == serverId }
-        servers.value = currentList
+        smbServerDao.deleteServer(serverId)
         disconnectFromServer(serverId)
     }
 
@@ -61,13 +61,7 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
             smbFile.exists()
 
             connections[server.id] = smbContext
-            val updatedServer = server.copy(isConnected = true)
-            val currentList = servers.value.toMutableList()
-            val index = currentList.indexOfFirst { it.id == server.id }
-            if (index != -1) {
-                currentList[index] = updatedServer
-                servers.value = currentList
-            }
+            smbServerDao.updateServerConnection(server.id, true)
             true
         } catch (e: Exception) {
             e.printStackTrace()
@@ -77,19 +71,14 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
 
     override suspend fun disconnectFromServer(serverId: String) {
         connections.remove(serverId)
-        val currentList = servers.value.toMutableList()
-        val index = currentList.indexOfFirst { it.id == serverId }
-        if (index != -1) {
-            currentList[index] = currentList[index].copy(isConnected = false)
-            servers.value = currentList
-        }
+        smbServerDao.updateServerConnection(serverId, false)
     }
 
     override suspend fun scanDirectory(serverId: String, path: String): List<FileItem> =
         withContext(Dispatchers.IO) {
             try {
                 val auth = connections[serverId]
-                val host = servers.value.find { it.id == serverId }?.host
+                val host = smbServerDao.findServer(serverId).host
                 val smbFile = SmbFile("smb://${host}/$path", auth)
                 smbFile.listFiles()?.map { file ->
                     if (file.isDirectory) {
