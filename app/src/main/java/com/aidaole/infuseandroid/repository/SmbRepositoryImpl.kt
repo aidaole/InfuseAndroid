@@ -1,14 +1,14 @@
 package com.aidaole.infuseandroid.repository
 
+import android.util.Log
 import com.aidaole.infuseandroid.domain.model.FileItem
 import com.aidaole.infuseandroid.domain.model.SmbServer
 import com.aidaole.infuseandroid.domain.repository.SmbRepository
-import com.hierynomus.msfscc.FileAttributes
-import com.hierynomus.smbj.SMBClient
-import com.hierynomus.smbj.auth.AuthenticationContext
-import com.hierynomus.smbj.connection.Connection
-import com.hierynomus.smbj.session.Session
-import com.hierynomus.smbj.share.DiskShare
+import jcifs.CIFSContext
+import jcifs.config.BaseConfiguration
+import jcifs.context.BaseContext
+import jcifs.smb.NtlmPasswordAuthentication
+import jcifs.smb.SmbFile
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,13 +16,16 @@ import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
+
 class SmbRepositoryImpl @Inject constructor() : SmbRepository {
+    companion object {
+        private const val TAG = "SmbRepositoryImpl"
+    }
+
     private val servers = MutableStateFlow<List<SmbServer>>(
         listOf(SmbServer("1", "mac", "192.168.31.191", "yxm", "xiao", false))
-
     )
-    private val connections = mutableMapOf<String, Connection>()
-    private val sessions = mutableMapOf<String, Session>()
+    private val connections = mutableMapOf<String, SmbFile>()
 
     override fun getServers(): Flow<List<SmbServer>> = servers
 
@@ -42,26 +45,30 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
 
     override suspend fun connectToServer(server: SmbServer): Boolean = withContext(Dispatchers.IO) {
         try {
-            val client = SMBClient()
-            val authContext = AuthenticationContext(server.username, server.password.toCharArray(), server.host)
-            val connection = client.connect(server.host)
-            val session = connection.authenticate(authContext)
+            val baseContext = BaseContext(BaseConfiguration(true))
+            val auth = NtlmPasswordAuthentication(
+                baseContext,
+                server.host,
+                server.username,
+                server.password
+            )
+            val smbContext = baseContext.withCredentials(auth)
 
-            if (session != null) {
-                connections[server.id] = connection
-                sessions[server.id] = session
-                val updatedServer = server.copy(isConnected = true)
-                val currentList = servers.value.toMutableList()
-                val index = currentList.indexOfFirst { it.id == server.id }
-                if (index != -1) {
-                    currentList[index] = updatedServer
-//                    scanDirectory(updatedServer.host, "/")
-                    servers.value = currentList
-                }
-                true
-            } else {
-                false
+            val smbUrl = "smb://${server.host}"
+            val smbFile = SmbFile(smbUrl, smbContext)
+
+            // 测试连接是否成功
+            smbFile.exists()
+
+            connections[server.id] = smbFile
+            val updatedServer = server.copy(isConnected = true)
+            val currentList = servers.value.toMutableList()
+            val index = currentList.indexOfFirst { it.id == server.id }
+            if (index != -1) {
+                currentList[index] = updatedServer
+                servers.value = currentList
             }
+            true
         } catch (e: Exception) {
             e.printStackTrace()
             false
@@ -69,11 +76,7 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
     }
 
     override suspend fun disconnectFromServer(serverId: String) {
-        sessions[serverId]?.close()
-        connections[serverId]?.close()
-        sessions.remove(serverId)
         connections.remove(serverId)
-
         val currentList = servers.value.toMutableList()
         val index = currentList.indexOfFirst { it.id == serverId }
         if (index != -1) {
@@ -83,67 +86,45 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
     }
 
     private suspend fun listShares(serverId: String): List<String> = withContext(Dispatchers.IO) {
-        val session = sessions[serverId] ?: throw IllegalStateException("Server not connected")
         try {
-            session.connectShare("IPC$").use { ipcShare ->
-                listOf(ipcShare.smbPath.shareName)
-            }
-//            session.connection.connectShare("IPC$").use { ipcShare ->
-//                session.connection.listShares().map { it.name }
-//            }
+            val smbFile = connections[serverId]
+
+            smbFile?.listFiles()
+                ?.filter { it.isDirectory }
+                ?.map { it.name.removeSuffix("/") } ?: emptyList()
         } catch (e: Exception) {
             e.printStackTrace()
             emptyList()
         }
     }
 
-    override suspend fun scanDirectory(serverId: String, path: String): List<FileItem> = withContext(Dispatchers.IO) {
-        val session = sessions[serverId] ?: throw IllegalStateException("Server not connected")
-        
-        if (path == "/") {
-            return@withContext listShares(serverId).map { shareName ->
-                FileItem.Directory(
-                    name = shareName,
-                    path = "/$shareName",
-                    lastModified = System.currentTimeMillis()
-                )
+    override suspend fun scanDirectory(serverId: String, path: String): List<FileItem> =
+        withContext(Dispatchers.IO) {
+            try {
+                val smbFile = connections[serverId]
+                val path = smbFile?.path ?: ""
+                smbFile?.listFiles()?.map { file ->
+                    if (file.isDirectory) {
+                        FileItem.Directory(
+                            name = file.name.removeSuffix("/"),
+                            path = file.path.substringAfter(path),
+                            lastModified = file.lastModified()
+                        )
+                    } else {
+                        FileItem.File(
+                            name = file.name,
+                            path = file.path.substringAfter(path),
+                            size = file.length(),
+                            lastModified = file.lastModified(),
+                            isVideo = isVideoFile(file.name)
+                        )
+                    }
+                } ?: emptyList()
+            } catch (e: Exception) {
+                e.printStackTrace()
+                emptyList()
             }
         }
-
-        val shareName = path.split("/").filter { it.isNotEmpty() }.firstOrNull()
-            ?: throw IllegalStateException("Invalid path")
-        val relativePath = path.substringAfter("/$shareName").let {
-            if (it.isEmpty()) "" else it.substring(1)
-        }
-
-        val share = session.connectShare(shareName) as? DiskShare
-            ?: throw IllegalStateException("Failed to connect to share")
-
-        try {
-            val items = mutableListOf<FileItem>()
-            share.list(relativePath).forEach { entry ->
-                val fullPath = "$path/${entry.fileName}"
-                if (entry.fileAttributes == FileAttributes.FILE_ATTRIBUTE_DIRECTORY.value) {
-                    items.add(FileItem.Directory(
-                        name = entry.fileName,
-                        path = fullPath,
-                        lastModified = entry.changeTime.toEpochMillis()
-                    ))
-                } else {
-                    items.add(FileItem.File(
-                        name = entry.fileName,
-                        path = fullPath,
-                        size = entry.endOfFile,
-                        lastModified = entry.changeTime.toEpochMillis(),
-                        isVideo = isVideoFile(entry.fileName)
-                    ))
-                }
-            }
-            items
-        } finally {
-            share.close()
-        }
-    }
 
     private fun isVideoFile(fileName: String): Boolean {
         val videoExtensions = listOf(

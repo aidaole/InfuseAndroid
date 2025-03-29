@@ -44,8 +44,7 @@ android {
 }
 
 dependencies {
-    implementation("com.hierynomus:smbj:0.14.0")
-//    implementation("eu.agno3.jcifs:jcifs-ng:2.1.9")
+    implementation("eu.agno3.jcifs:jcifs-ng:2.1.9")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
