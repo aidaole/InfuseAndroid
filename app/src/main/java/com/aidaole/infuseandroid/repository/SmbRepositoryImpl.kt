@@ -25,7 +25,7 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
     private val servers = MutableStateFlow<List<SmbServer>>(
         listOf(SmbServer("1", "mac", "192.168.31.191", "yxm", "xiao", false))
     )
-    private val connections = mutableMapOf<String, SmbFile>()
+    private val connections = mutableMapOf<String, CIFSContext>()
 
     override fun getServers(): Flow<List<SmbServer>> = servers
 
@@ -60,7 +60,7 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
             // 测试连接是否成功
             smbFile.exists()
 
-            connections[server.id] = smbFile
+            connections[server.id] = smbContext
             val updatedServer = server.copy(isConnected = true)
             val currentList = servers.value.toMutableList()
             val index = currentList.indexOfFirst { it.id == server.id }
@@ -85,35 +85,23 @@ class SmbRepositoryImpl @Inject constructor() : SmbRepository {
         }
     }
 
-    private suspend fun listShares(serverId: String): List<String> = withContext(Dispatchers.IO) {
-        try {
-            val smbFile = connections[serverId]
-
-            smbFile?.listFiles()
-                ?.filter { it.isDirectory }
-                ?.map { it.name.removeSuffix("/") } ?: emptyList()
-        } catch (e: Exception) {
-            e.printStackTrace()
-            emptyList()
-        }
-    }
-
     override suspend fun scanDirectory(serverId: String, path: String): List<FileItem> =
         withContext(Dispatchers.IO) {
             try {
-                val smbFile = connections[serverId]
-                val path = smbFile?.path ?: ""
-                smbFile?.listFiles()?.map { file ->
+                val auth = connections[serverId]
+                val host = servers.value.find { it.id == serverId }?.host
+                val smbFile = SmbFile("smb://${host}/$path", auth)
+                smbFile.listFiles()?.map { file ->
                     if (file.isDirectory) {
                         FileItem.Directory(
                             name = file.name.removeSuffix("/"),
-                            path = file.path.substringAfter(path),
+                            path = file.path.removePrefix("smb://$host/"),
                             lastModified = file.lastModified()
                         )
                     } else {
                         FileItem.File(
                             name = file.name,
-                            path = file.path.substringAfter(path),
+                            path = file.path.removePrefix("smb://$host/"),
                             size = file.length(),
                             lastModified = file.lastModified(),
                             isVideo = isVideoFile(file.name)
