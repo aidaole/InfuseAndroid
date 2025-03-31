@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aidaole.infuseandroid.domain.model.FileItem
 import com.aidaole.infuseandroid.domain.model.SmbServer
+import com.aidaole.infuseandroid.ui.widgets.ExpanedCardView
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -43,6 +44,10 @@ fun SmbServiceScreen(
             text = "SMB Servers",
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 16.dp)
+        )
+        ExpanedCardView(
+            "Title",
+            "this is content".repeat(100)
         )
 
         Button(
