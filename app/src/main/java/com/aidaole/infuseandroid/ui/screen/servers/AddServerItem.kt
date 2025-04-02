@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.sharp.Edit
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aidaole.infuseandroid.R
+import com.aidaole.infuseandroid.ui.theme.IconHintColor
 
 @Composable
 fun AddServerItem(
@@ -45,7 +46,7 @@ fun AddServerItem(
         Column(
             modifier = Modifier.height(50.dp)
         ) {
-            Spacer(modifier = Modifier.height(17.dp))
+            Spacer(modifier = Modifier.height(15.dp))
             Row {
                 Text(
                     text = text,
@@ -54,7 +55,8 @@ fun AddServerItem(
                 )
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
-                    imageVector = Icons.Default.Edit,
+                    tint = IconHintColor,
+                    imageVector = Icons.Sharp.Edit,
                     contentDescription = "Add Server",
                     modifier = Modifier.size(16.dp)
                 )

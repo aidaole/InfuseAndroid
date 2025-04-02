@@ -60,36 +60,13 @@ fun SmbServiceScreen(
     val currentPath by viewModel.currentPath.collectAsState()
     val files by viewModel.files.collectAsState()
 
-    Log.d("SmbServiceScreen", "SmbServiceScreen: ${servers}")
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(start = 16.dp, end = 16.dp)
+        modifier = Modifier.fillMaxSize()
     ) {
-        ScreenTitle(
-            text = "服务器"
-        )
-        AddServerItem(
-            text = "DiskStation(SMB)",
-            serverIcon = painterResource(R.drawable.ic_smb),
-            onClicked = {
-                showAddDialog = true
-            }
-        )
-        AddServerItem(
-            text = "Aliyun",
-            serverIcon = painterResource(R.drawable.ic_aliyun),
-            onClicked = {
-                showAddDialog = true
-            }
-        )
-        AddServerItem(
-            "Box",
-            serverIcon = painterResource(R.drawable.ic_box),
-            onClicked = {
-                showAddDialog = true
-            }
-        )
+        ScreenTitle(text = "服务器")
+        AddServerItems { id ->
+            showAddDialog = true
+        }
         Spacer(modifier = Modifier.height(40.dp))
 
         when (uiState) {
@@ -129,8 +106,7 @@ fun SmbServiceScreen(
                                 when (item) {
                                     is FileItem.Directory -> {
                                         viewModel.navigateToDirectory(
-                                            servers.firstOrNull { it.isConnected }?.id
-                                                ?: return@FileItem, item.path
+                                            servers.firstOrNull { it.isConnected }?.id ?: return@FileItem, item.path
                                         )
                                     }
 
@@ -147,52 +123,67 @@ fun SmbServiceScreen(
     }
 
     if (showAddDialog) {
-        AlertDialog(onDismissRequest = { showAddDialog = false },
-            title = { Text("Add SMB Server") },
-            text = {
-                Column {
-                    OutlinedTextField(value = name,
-                        onValueChange = { name = it },
-                        label = { Text("Name") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = host,
-                        onValueChange = { host = it },
-                        label = { Text("Host (e.g. 192.168.1.100)") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = username,
-                        onValueChange = { username = it },
-                        label = { Text("Username") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Password") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-            },
-            confirmButton = {
-                TextButton(onClick = {
-                    viewModel.addServer(name, host, username, password)
-                    showAddDialog = false
-                    name = ""
-                    host = ""
-                    username = ""
-                    password = ""
-                }) {
-                    Text("Add")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showAddDialog = false }) {
-                    Text("Cancel")
-                }
-            })
+        AlertDialog(onDismissRequest = { showAddDialog = false }, title = { Text("Add SMB Server") }, text = {
+            Column {
+                OutlinedTextField(value = name,
+                    onValueChange = { name = it },
+                    label = { Text("Name") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(value = host,
+                    onValueChange = { host = it },
+                    label = { Text("Host (e.g. 192.168.1.100)") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(value = username,
+                    onValueChange = { username = it },
+                    label = { Text("Username") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Password") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }, confirmButton = {
+            TextButton(onClick = {
+                viewModel.addServer(name, host, username, password)
+                showAddDialog = false
+                name = ""
+                host = ""
+                username = ""
+                password = ""
+            }) {
+                Text("Add")
+            }
+        }, dismissButton = {
+            TextButton(onClick = { showAddDialog = false }) {
+                Text("Cancel")
+            }
+        })
+    }
+}
+
+@Composable
+private fun AddServerItems(
+    onItemClick: (id: Int) -> Unit
+) {
+    Column(
+        modifier = Modifier.padding(horizontal = 16.dp)
+    ) {
+        AddServerItem(text = "DiskStation(SMB)", serverIcon = painterResource(R.drawable.ic_smb), onClicked = {
+            onItemClick(0)
+        })
+        AddServerItem(text = "Aliyun", serverIcon = painterResource(R.drawable.ic_aliyun), onClicked = {
+            onItemClick(1)
+        })
+        AddServerItem("Box", serverIcon = painterResource(R.drawable.ic_box), onClicked = {
+            onItemClick(2)
+        })
     }
 }
 
@@ -222,9 +213,7 @@ fun ServerItem(
             }
             Row {
                 Button(
-                    onClick = onConnect,
-                    enabled = !server.isConnected,
-                    modifier = Modifier.padding(end = 8.dp)
+                    onClick = onConnect, enabled = !server.isConnected, modifier = Modifier.padding(end = 8.dp)
                 ) {
                     Text(if (server.isConnected) "Connected" else "Connect")
                 }
@@ -248,8 +237,7 @@ fun FileItem(
         Row(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = when (item) {
@@ -262,27 +250,20 @@ fun FileItem(
                     text = when (item) {
                         is FileItem.Directory -> item.name
                         is FileItem.File -> item.name
-                    },
-                    style = MaterialTheme.typography.bodyLarge,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    }, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = when (item) {
                         is FileItem.Directory -> "Directory"
                         is FileItem.File -> formatFileSize(item.size)
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    }, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             Text(
                 text = when (item) {
                     is FileItem.Directory -> formatDate(item.lastModified)
                     is FileItem.File -> formatDate(item.lastModified)
-                },
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
