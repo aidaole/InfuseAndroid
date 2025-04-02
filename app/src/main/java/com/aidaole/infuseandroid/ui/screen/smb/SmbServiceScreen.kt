@@ -34,9 +34,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.aidaole.infuseandroid.R
 import com.aidaole.infuseandroid.domain.model.FileItem
 import com.aidaole.infuseandroid.domain.model.SmbServer
 import java.text.SimpleDateFormat
@@ -74,14 +76,29 @@ fun SmbServiceScreen(
                 style = MaterialTheme.typography.headlineMedium,
 
             )
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(
-                onClick = { showAddDialog = true },
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Server", modifier = Modifier.size(20.dp))
-            }
         }
-
+        AddServerItem(
+            text = "DiskStation(SMB)",
+            serverIcon = painterResource(R.drawable.ic_smb),
+            onClicked = {
+                showAddDialog = true
+            }
+        )
+        AddServerItem(
+            text = "Aliyun",
+            serverIcon = painterResource(R.drawable.ic_aliyun),
+            onClicked = {
+                showAddDialog = true
+            }
+        )
+        AddServerItem(
+            "Box",
+            serverIcon = painterResource(R.drawable.ic_box),
+            onClicked = {
+                showAddDialog = true
+            }
+        )
+        Spacer(modifier = Modifier.height(40.dp))
 
         when (uiState) {
             is SmbServiceUiState.Loading -> {
