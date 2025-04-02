@@ -46,6 +46,7 @@ android {
 dependencies {
     implementation("eu.agno3.jcifs:jcifs-ng:2.1.9")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
+    implementation("androidx.compose.material:material-icons-extended:1.7.8")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

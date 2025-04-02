@@ -1,23 +1,23 @@
 package com.aidaole.infuseandroid.ui.screen.main
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.selectableGroup
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Folder
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -40,9 +40,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.aidaole.infuseandroid.ui.screen.display.DisplayScreen
+import com.aidaole.infuseandroid.ui.screen.home.HomeScreen
+import com.aidaole.infuseandroid.ui.screen.search.SearchScreen
 import com.aidaole.infuseandroid.ui.screen.servers.SmbServiceScreen
-import com.aidaole.infuseandroid.ui.screen.user.UserScreen
+import com.aidaole.infuseandroid.ui.screen.settings.SettingScreen
 import com.aidaole.infuseandroid.ui.theme.Orange
 
 
@@ -59,23 +60,20 @@ fun MainScreen() {
         // 使用自定义的无动画NavHost
         NoAnimationNavHost(
             navController = navController,
-            startDestination = "display",
+            startDestination = "home",
             modifier = Modifier.padding(padding)
         ) {
-            composable("display") {
-                DisplayScreen()
+            composable("home") {
+                HomeScreen()
             }
             composable("search") {
-                // TODO: 实现搜索页面
-                Box(modifier = Modifier.padding(16.dp)) {
-                    Text("搜索页面")
-                }
+                SearchScreen()
             }
             composable("server") {
                 SmbServiceScreen()
             }
             composable("settings") {
-                UserScreen()
+                SettingScreen()
             }
         }
     }
@@ -121,8 +119,22 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 8.dp)
                     .selectableGroup(),
-                verticalAlignment = Alignment.CenterVertically
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically,
             ) {
+                // 首页按钮
+                val homeSelected = currentRoute == "home"
+                NavigationItem(
+                    icon = if (homeSelected) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow,
+                    label = "首页",
+                    selected = homeSelected,
+                    onClick = {
+                        if (currentRoute != "home") {
+                            navigateWithNoAnimation(navController, "home")
+                        }
+                    }
+                )
+
                 // 搜索按钮
                 val searchSelected = currentRoute == "search"
                 NavigationItem(
@@ -134,16 +146,12 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
                             navigateWithNoAnimation(navController, "search")
                         }
                     },
-                    modifier = Modifier.weight(1f)
                 )
-                
-                // 中间留空，给主页按钮腾出空间
-                Spacer(modifier = Modifier.weight(1f))
                 
                 // 文件按钮
                 val serverSelected = currentRoute == "server"
                 NavigationItem(
-                    icon = Icons.Outlined.Home,
+                    icon = if (serverSelected) Icons.Filled.Folder else Icons.Outlined.Folder,
                     label = "文件",
                     selected = serverSelected,
                     onClick = {
@@ -151,7 +159,6 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
                             navigateWithNoAnimation(navController, "server")
                         }
                     },
-                    modifier = Modifier.weight(1f)
                 )
                 
                 // 设置按钮
@@ -165,50 +172,8 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
                             navigateWithNoAnimation(navController, "settings")
                         }
                     },
-                    modifier = Modifier.weight(1f)
                 )
             }
-        }
-        
-        // 浮动的主页按钮 - 居中放置在顶部
-        val homeSelected = currentRoute == "display"
-        FloatingHomeButton(
-            selected = homeSelected,
-            onClick = {
-                if (currentRoute != "display") {
-                    navigateWithNoAnimation(navController, "display")
-                }
-            },
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = (-20).dp)
-        )
-    }
-}
-
-@Composable
-fun FloatingHomeButton(
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier
-            .size(50.dp)
-            .shadow(6.dp, CircleShape),
-        shape = CircleShape,
-        color = Orange
-    ) {
-        IconButton(
-            onClick = onClick,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Icon(
-                imageVector = if (selected) Icons.Filled.Home else Icons.Outlined.Home,
-                contentDescription = "首页",
-                tint = Color.White,
-                modifier = Modifier.size(28.dp)
-            )
         }
     }
 }
@@ -233,7 +198,7 @@ fun NavigationItem(
                 imageVector = icon,
                 contentDescription = label,
                 tint = if (selected) Orange else Color.Gray,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(26.dp)
             )
         }
     }

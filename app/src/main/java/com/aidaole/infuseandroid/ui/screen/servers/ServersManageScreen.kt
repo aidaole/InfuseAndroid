@@ -40,6 +40,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.aidaole.infuseandroid.R
 import com.aidaole.infuseandroid.domain.model.FileItem
 import com.aidaole.infuseandroid.domain.model.SmbServer
+import com.aidaole.infuseandroid.ui.widgets.ScreenTitle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -65,18 +66,9 @@ fun SmbServiceScreen(
             .fillMaxSize()
             .padding(start = 16.dp, end = 16.dp)
     ) {
-        Row (
-            modifier = Modifier.fillMaxWidth()
-                .padding(top = 16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "服务器",
-                style = MaterialTheme.typography.headlineMedium,
-
-            )
-        }
-        Spacer(modifier = Modifier.height(16.dp))
+        ScreenTitle(
+            text = "服务器"
+        )
         AddServerItem(
             text = "DiskStation(SMB)",
             serverIcon = painterResource(R.drawable.ic_smb),

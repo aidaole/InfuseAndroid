@@ -1,4 +1,4 @@
-package com.aidaole.infuseandroid.ui.screen.display
+package com.aidaole.infuseandroid.ui.screen.home
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,22 +36,24 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.aidaole.infuseandroid.ui.theme.Orange
+import com.aidaole.infuseandroid.ui.widgets.ScreenTitle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DisplayScreen() {
+fun HomeScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
     ) {
-        Text(
-            text = "发现", style = MaterialTheme.typography.headlineMedium, modifier = Modifier.padding(top = 16.dp)
+        ScreenTitle(
+            "发现"
         )
         // 分类选项卡
         var selectedTabIndex by remember { mutableStateOf(0) }
 
-        TabRow(selectedTabIndex = selectedTabIndex,
+        TabRow(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+            selectedTabIndex = selectedTabIndex,
             containerColor = Color.Transparent,
             contentColor = Orange,
             indicator = { tabPositions ->
@@ -85,7 +87,7 @@ fun DisplayScreen() {
             contentPadding = PaddingValues(8.dp),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize().padding(start = 16.dp, end = 16.dp)
         ) {
             // TODO: 替换为实际数据
             items((1..20).toList()) { index ->
