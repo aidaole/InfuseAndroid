@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.aidaole.infuseandroid.ui.screen.display.DisplayScreen
 import com.aidaole.infuseandroid.ui.screen.smb.SmbServiceScreen
 import com.aidaole.infuseandroid.ui.screen.user.UserScreen
+import androidx.navigation.NavGraphBuilder
 
 
 // 主屏幕
@@ -33,22 +34,39 @@ fun MainScreen() {
             BottomNavigationBar(navController = navController)
         }
     ) { padding ->
-        NavHost(
+        // 使用自定义的无动画NavHost
+        NoAnimationNavHost(
             navController = navController,
-            startDestination = "server",
+            startDestination = "display",
             modifier = Modifier.padding(padding)
         ) {
-            composable("server") {
-                SmbServiceScreen()
-            }
             composable("display") {
                 DisplayScreen()
+            }
+            composable("server") {
+                SmbServiceScreen()
             }
             composable("user") {
                 UserScreen()
             }
         }
     }
+}
+
+// 自定义无动画NavHost
+@Composable
+fun NoAnimationNavHost(
+    navController: NavHostController,
+    startDestination: String,
+    modifier: Modifier = Modifier,
+    builder: NavGraphBuilder.() -> Unit
+) {
+    NavHost(
+        navController = navController,
+        startDestination = startDestination,
+        modifier = modifier,
+        builder = builder
+    )
 }
 
 // 底部导航栏组件
@@ -69,6 +87,13 @@ fun BottomNavigationBar(navController: NavHostController) {
                             // 防止重复点击同一项时堆栈重复
                             popUpTo(navController.graph.startDestinationId)
                             launchSingleTop = true
+                            // 禁用动画
+                            anim {
+                                this.enter = 0
+                                this.exit = 0
+                                this.popEnter = 0
+                                this.popExit = 0
+                            }
                         }
                     }
                 }
@@ -79,14 +104,14 @@ fun BottomNavigationBar(navController: NavHostController) {
 
 val bottomNavItems = listOf(
     BottomNavItem(
-        name = "Server",
-        route = "server",
-        icon = Icons.Default.Share
-    ),
-    BottomNavItem(
         name = "display",
         route = "display",
         icon = Icons.Default.Favorite
+    ),
+    BottomNavItem(
+        name = "Server",
+        route = "server",
+        icon = Icons.Default.Share
     ),
     BottomNavItem(
         name = "user",
