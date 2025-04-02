@@ -22,9 +22,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
         
-        // 禁用导航动画
-        window.setWindowAnimations(0)
-        
         setContent {
             InfuseAndroidTheme {
                 ImmersiveScreen()
