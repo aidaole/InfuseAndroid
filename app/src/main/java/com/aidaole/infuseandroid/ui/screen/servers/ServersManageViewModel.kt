@@ -1,4 +1,4 @@
-package com.aidaole.infuseandroid.ui.screen.smb
+package com.aidaole.infuseandroid.ui.screen.servers
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

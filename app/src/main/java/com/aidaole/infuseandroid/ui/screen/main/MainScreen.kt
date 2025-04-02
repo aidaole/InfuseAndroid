@@ -22,7 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aidaole.infuseandroid.ui.screen.display.DisplayScreen
-import com.aidaole.infuseandroid.ui.screen.smb.SmbServiceScreen
+import com.aidaole.infuseandroid.ui.screen.servers.SmbServiceScreen
 import com.aidaole.infuseandroid.ui.screen.user.UserScreen
 
 
