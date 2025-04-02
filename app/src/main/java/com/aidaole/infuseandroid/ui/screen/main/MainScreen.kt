@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -34,7 +32,6 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -52,19 +49,14 @@ import com.aidaole.infuseandroid.ui.theme.Orange
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-    Scaffold(
-        bottomBar = {
-            CustomBottomNavigationBar(navController = navController)
-        }
-    ) { padding ->
-        // 使用自定义的无动画NavHost
-        NoAnimationNavHost(
-            navController = navController,
-            startDestination = "home",
-            modifier = Modifier.padding(padding)
+    Scaffold(bottomBar = {
+        CustomBottomNavigationBar(navController = navController)
+    }) { padding ->
+        NavHost(
+            navController = navController, startDestination = "home", modifier = Modifier.padding(padding)
         ) {
             composable("home") {
-                HomeScreen()
+                HomeScreen(navController)
             }
             composable("search") {
                 SearchScreen()
@@ -79,31 +71,14 @@ fun MainScreen() {
     }
 }
 
-// 自定义无动画NavHost
-@Composable
-fun NoAnimationNavHost(
-    navController: NavHostController,
-    startDestination: String,
-    modifier: Modifier = Modifier,
-    builder: NavGraphBuilder.() -> Unit
-) {
-    NavHost(
-        navController = navController,
-        startDestination = startDestination,
-        modifier = modifier,
-        builder = builder
-    )
-}
-
 // 自定义底部导航栏
 @Composable
 fun CustomBottomNavigationBar(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    
+
     Box(
-        modifier = Modifier.fillMaxWidth(),
-        contentAlignment = Alignment.BottomCenter
+        modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.BottomCenter
     ) {
         // 底部导航栏主体
         Surface(
@@ -124,16 +99,14 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
             ) {
                 // 首页按钮
                 val homeSelected = currentRoute == "home"
-                NavigationItem(
-                    icon = if (homeSelected) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow,
+                NavigationItem(icon = if (homeSelected) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow,
                     label = "首页",
                     selected = homeSelected,
                     onClick = {
                         if (currentRoute != "home") {
                             navigateWithNoAnimation(navController, "home")
                         }
-                    }
-                )
+                    })
 
                 // 搜索按钮
                 val searchSelected = currentRoute == "search"
@@ -147,7 +120,7 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
                         }
                     },
                 )
-                
+
                 // 文件按钮
                 val serverSelected = currentRoute == "server"
                 NavigationItem(
@@ -160,7 +133,7 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
                         }
                     },
                 )
-                
+
                 // 设置按钮
                 val settingsSelected = currentRoute == "settings"
                 NavigationItem(
@@ -180,19 +153,13 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
 
 @Composable
 fun NavigationItem(
-    icon: ImageVector,
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    icon: ImageVector, label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
+        horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier
     ) {
         IconButton(
-            onClick = onClick,
-            modifier = Modifier.size(40.dp)
+            onClick = onClick, modifier = Modifier.size(40.dp)
         ) {
             Icon(
                 imageVector = icon,
@@ -204,9 +171,9 @@ fun NavigationItem(
     }
 }
 
-private fun navigateWithNoAnimation(navController: NavHostController, route: String) {
+fun navigateWithNoAnimation(navController: NavHostController, route: String) {
     navController.navigate(route) {
-        popUpTo(navController.graph.startDestinationId)
+//        popUpTo(navController.graph.startDestinationId)
         launchSingleTop = true
         anim {
             this.enter = 0

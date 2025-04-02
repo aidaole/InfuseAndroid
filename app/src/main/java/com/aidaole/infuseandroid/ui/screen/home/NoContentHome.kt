@@ -13,14 +13,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.aidaole.infuseandroid.R
+import com.aidaole.infuseandroid.ui.screen.main.navigateWithNoAnimation
 
 @Composable
-fun NoContentHome() {
+fun NoContentHome(navController: NavHostController) {
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
@@ -45,7 +49,9 @@ fun NoContentHome() {
         )
         Spacer(modifier = Modifier.height(60.dp))
         Button(
-            onClick = { /*TODO*/ }, modifier = Modifier.padding(top = 16.dp)
+            onClick = {
+                navigateWithNoAnimation(navController, "server")
+            }, modifier = Modifier.padding(top = 16.dp)
         ) {
             Text("新增文件来源")
         }
@@ -56,5 +62,5 @@ fun NoContentHome() {
 @Composable
 @Preview
 private fun NoContentHomePreview() {
-    NoContentHome()
+    NoContentHome(NavHostController(context = LocalContext.current))
 }
