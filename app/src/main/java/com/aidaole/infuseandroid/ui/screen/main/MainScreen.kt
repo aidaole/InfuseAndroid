@@ -28,7 +28,6 @@ import com.aidaole.infuseandroid.ui.screen.user.UserScreen
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
-
     Scaffold(
         bottomBar = {
             BottomNavigationBar(navController = navController)

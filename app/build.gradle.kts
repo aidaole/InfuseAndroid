@@ -45,6 +45,7 @@ android {
 
 dependencies {
     implementation("eu.agno3.jcifs:jcifs-ng:2.1.9")
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.32.0")
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
