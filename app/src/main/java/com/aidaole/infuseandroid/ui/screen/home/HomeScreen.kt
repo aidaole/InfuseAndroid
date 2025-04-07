@@ -30,27 +30,22 @@ import com.aidaole.infuseandroid.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    Scaffold(
-        bottomBar = { HomeBottomBar(navController) }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .verticalScroll(rememberScrollState())
-        ) {
-            // 顶部标题
-            HomeTopBar()
-            
-            // 主要内容区域
-            MainContentSection()
-            
-            // 最近添加
-            RecentlyAddedSection()
-            
-            // 电影类型
-            MovieCategoriesSection()
-        }
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+    ) {
+        // 顶部标题
+        HomeTopBar()
+        
+        // 主要内容区域
+        MainContentSection()
+        
+        // 最近添加
+        RecentlyAddedSection()
+        
+        // 电影类型
+        MovieCategoriesSection()
     }
 }
 
@@ -184,24 +179,6 @@ fun CategoryItem(
             color = Color.White,
             fontSize = 18.sp,
             fontWeight = FontWeight.Bold
-        )
-    }
-}
-
-@Composable
-fun HomeBottomBar(navController: NavHostController) {
-    NavigationBar {
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Home, contentDescription = "首页") },
-            label = { Text("首页") },
-            selected = true,
-            onClick = { /* TODO */ }
-        )
-        NavigationBarItem(
-            icon = { Icon(Icons.Default.Search, contentDescription = "搜索") },
-            label = { Text("搜索") },
-            selected = false,
-            onClick = { /* TODO */ }
         )
     }
 }
