@@ -26,8 +26,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.aidaole.infuseandroid.R
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(
+    ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class
+)
 @Composable
 fun HomeScreen(navController: NavHostController) {
     Column(
@@ -37,13 +41,13 @@ fun HomeScreen(navController: NavHostController) {
     ) {
         // 顶部标题
         HomeTopBar()
-        
+
         // 主要内容区域
         MainContentSection()
-        
+
         // 最近添加
         RecentlyAddedSection()
-        
+
         // 电影类型
         MovieCategoriesSection()
     }
@@ -59,9 +63,7 @@ fun HomeTopBar() {
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
-            text = "主屏幕",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
+            text = "主屏幕", fontSize = 24.sp, fontWeight = FontWeight.Bold
         )
         Row {
             IconButton(onClick = { /* TODO */ }) {
@@ -74,22 +76,27 @@ fun HomeTopBar() {
     }
 }
 
+@OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun MainContentSection() {
-    Box(
+    // 假设有 3 个页面
+    val pageCount = 3
+    val pagerState = rememberPagerState(pageCount = { pageCount })
+
+    HorizontalPager(state = pagerState,
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
-            .padding(16.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.LightGray)
-    ) {
-        // 这里使用占位图
+            .height(200.dp) // Pager 的高度
+            .padding(horizontal = 16.dp), // 左右留边距，如果需要全宽则移除
+        key = { it } // 为每个页面提供唯一的 key
+    ) { page ->
         Image(
-            painter = painterResource(id = R.drawable.playceholder),
-            contentDescription = "主要内容",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
+            painter = painterResource(id = R.drawable.playceholder), // 可以根据 page 动态选择图片
+            contentDescription = "主要内容 Page ${page + 1}",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(20.dp)),
         )
     }
 }
@@ -103,15 +110,13 @@ fun RecentlyAddedSection() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "最近添加",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                text = "最近添加", fontSize = 20.sp, fontWeight = FontWeight.Bold
             )
             TextButton(onClick = { /* TODO */ }) {
                 Text("查看全部")
             }
         }
-        
+
         LazyRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
@@ -137,48 +142,41 @@ fun MovieCategoriesSection() {
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "电影类型",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold
+                text = "电影类型", fontSize = 20.sp, fontWeight = FontWeight.Bold
             )
             TextButton(onClick = { /* TODO */ }) {
                 Text("查看全部")
             }
         }
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+
+        // 使用 LazyRow 替代 Row 以支持水平滚动
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            CategoryItem(
-                modifier = Modifier.weight(1f),
-                title = "冒险"
-            )
-            CategoryItem(
-                modifier = Modifier.weight(1f),
-                title = "动作"
-            )
+            // 添加更多项目以演示滚动
+            items(6) { index -> // 例如，显示 6 个类别
+                CategoryItem(
+                    // modifier = Modifier.weight(1f), // LazyRow 中的项目通常不使用 weight
+                    modifier = Modifier.width(150.dp), // 为项目设置固定宽度
+                    title = "类别 ${index + 1}" // 使用示例标题
+                )
+            }
         }
     }
 }
 
 @Composable
 fun CategoryItem(
-    modifier: Modifier = Modifier,
-    title: String
+    modifier: Modifier = Modifier, title: String
 ) {
     Box(
         modifier = modifier
             .height(100.dp)
             .clip(RoundedCornerShape(8.dp))
-            .background(Color.LightGray),
-        contentAlignment = Alignment.Center
+            .background(Color.LightGray), contentAlignment = Alignment.Center
     ) {
         Text(
-            text = title,
-            color = Color.White,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
+            text = title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold
         )
     }
 }
