@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Done
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.InsertDriveFile
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.VideoFile
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -38,8 +40,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aidaole.infuseandroid.R
-import com.aidaole.infuseandroid.domain.model.FileItem
-import com.aidaole.infuseandroid.domain.model.SmbServer
+import com.aidaole.infuseandroid.data.model.FavoriteFolder
+import com.aidaole.infuseandroid.data.model.FileItem
+import com.aidaole.infuseandroid.data.model.SmbServer
 import com.aidaole.infuseandroid.ui.widgets.ScreenTitle
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -47,7 +50,7 @@ import java.util.Locale
 
 @Composable
 fun SmbServiceScreen(
-    viewModel: SmbServiceViewModel = hiltViewModel()
+    viewModel: ServersManageViewModel = hiltViewModel()
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
@@ -59,6 +62,7 @@ fun SmbServiceScreen(
     val servers by viewModel.servers.collectAsState()
     val currentPath by viewModel.currentPath.collectAsState()
     val files by viewModel.files.collectAsState()
+    val favoriteFolders by viewModel.favoriteFolders.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -92,6 +96,24 @@ fun SmbServiceScreen(
                             onRemove = { viewModel.removeServer(server.id) })
                     }
 
+                    if (favoriteFolders.isNotEmpty()) {
+                        item {
+                            Text(
+                                text = "已存储的共享",
+                                style = MaterialTheme.typography.titleLarge,
+                                modifier = Modifier.padding(16.dp)
+                            )
+                        }
+
+                        items(favoriteFolders) { folder ->
+                            FavoriteFolderItem(
+                                folder = folder,
+                                onItemClick = { viewModel.navigateToDirectory(folder.serverId, folder.path) },
+                                onRemove = { viewModel.removeFavoriteFolder(folder.id) }
+                            )
+                        }
+                    }
+
                     if (files.isNotEmpty()) {
                         item {
                             Text(
@@ -102,19 +124,31 @@ fun SmbServiceScreen(
                         }
 
                         items(files) { item ->
-                            FileItem(item = item, onItemClick = {
-                                when (item) {
-                                    is FileItem.Directory -> {
-                                        viewModel.navigateToDirectory(
-                                            servers.firstOrNull { it.isConnected }?.id ?: return@FileItem, item.path
+                            FileItem(
+                                item = item,
+                                onItemClick = {
+                                    when (item) {
+                                        is FileItem.Directory -> {
+                                            viewModel.navigateToDirectory(
+                                                servers.firstOrNull { it.isConnected }?.id ?: return@FileItem,
+                                                item.path
+                                            )
+                                        }
+                                        is FileItem.File -> {
+                                            Log.d("SmbServiceScreen", "SmbServiceScreen: ${item.name}")
+                                        }
+                                    }
+                                },
+                                onFavorite = {
+                                    if (item is FileItem.Directory) {
+                                        viewModel.addFavoriteFolder(
+                                            servers.firstOrNull { it.isConnected }?.id ?: return@FileItem,
+                                            item.path,
+                                            item.name
                                         )
                                     }
-
-                                    is FileItem.File -> {
-                                        Log.d("SmbServiceScreen", "SmbServiceScreen: ${item.name}")
-                                    }
                                 }
-                            })
+                            )
                         }
                     }
                 }
@@ -226,49 +260,103 @@ fun ServerItem(
 }
 
 @Composable
-fun FileItem(
-    item: FileItem, onItemClick: () -> Unit
+fun FavoriteFolderItem(
+    folder: FavoriteFolder,
+    onItemClick: () -> Unit,
+    onRemove: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp), onClick = onItemClick
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        onClick = onItemClick
     ) {
         Row(
             modifier = Modifier
                 .padding(16.dp)
-                .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = folder.name,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = folder.path,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+            IconButton(onClick = onRemove) {
+                Icon(Icons.Default.Delete, contentDescription = "Remove")
+            }
+        }
+    }
+}
+
+@Composable
+fun FileItem(
+    item: FileItem,
+    onItemClick: () -> Unit,
+    onFavorite: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        onClick = onItemClick
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = when (item) {
-                    is FileItem.Directory -> Icons.Default.Add
-                    is FileItem.File -> if (item.isVideo) Icons.Filled.Home else Icons.Default.Done
-                }, contentDescription = null, modifier = Modifier.padding(end = 16.dp)
+                    is FileItem.Directory -> Icons.Default.Folder
+                    is FileItem.File -> if (item.isVideo) Icons.Default.VideoFile else Icons.Default.InsertDriveFile
+                },
+                contentDescription = null,
+                modifier = Modifier.padding(end = 16.dp)
             )
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = when (item) {
                         is FileItem.Directory -> item.name
                         is FileItem.File -> item.name
-                    }, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = when (item) {
                         is FileItem.Directory -> "Directory"
                         is FileItem.File -> formatFileSize(item.size)
-                    }, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
+            }
+            if (item is FileItem.Directory) {
+                IconButton(onClick = onFavorite) {
+                    Icon(Icons.Default.Star, contentDescription = "Favorite")
+                }
             }
             Text(
                 text = when (item) {
                     is FileItem.Directory -> formatDate(item.lastModified)
                     is FileItem.File -> formatDate(item.lastModified)
-                }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
 }
-
 
 private fun formatFileSize(size: Long): String {
     val units = arrayOf("B", "KB", "MB", "GB", "TB")

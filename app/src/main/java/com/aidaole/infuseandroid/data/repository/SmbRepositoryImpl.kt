@@ -1,12 +1,11 @@
-package com.aidaole.infuseandroid.repository
+package com.aidaole.infuseandroid.data.repository
 
 
 import com.aidaole.infuseandroid.data.dao.SmbServerDao
 import com.aidaole.infuseandroid.data.entity.toDomain
 import com.aidaole.infuseandroid.data.entity.toEntity
-import com.aidaole.infuseandroid.domain.model.FileItem
-import com.aidaole.infuseandroid.domain.model.SmbServer
-import com.aidaole.infuseandroid.domain.repository.SmbRepository
+import com.aidaole.infuseandroid.data.model.FileItem
+import com.aidaole.infuseandroid.data.model.SmbServer
 import jcifs.CIFSContext
 import jcifs.config.BaseConfiguration
 import jcifs.context.BaseContext

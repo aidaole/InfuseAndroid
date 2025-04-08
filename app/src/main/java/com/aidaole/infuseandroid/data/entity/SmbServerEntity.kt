@@ -2,7 +2,7 @@ package com.aidaole.infuseandroid.data.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.aidaole.infuseandroid.domain.model.SmbServer
+import com.aidaole.infuseandroid.data.model.SmbServer
 
 @Entity(tableName = "smb_servers")
 data class SmbServerEntity(

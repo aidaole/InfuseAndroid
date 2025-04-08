@@ -2,9 +2,10 @@ package com.aidaole.infuseandroid.ui.screen.servers
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aidaole.infuseandroid.domain.model.FileItem
-import com.aidaole.infuseandroid.domain.model.SmbServer
-import com.aidaole.infuseandroid.domain.repository.SmbRepository
+import com.aidaole.infuseandroid.data.model.FavoriteFolder
+import com.aidaole.infuseandroid.data.model.FileItem
+import com.aidaole.infuseandroid.data.model.SmbServer
+import com.aidaole.infuseandroid.data.repository.SmbRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SmbServiceViewModel @Inject constructor(
+class ServersManageViewModel @Inject constructor(
     private val repository: SmbRepository
 ) : ViewModel() {
 
@@ -29,6 +30,9 @@ class SmbServiceViewModel @Inject constructor(
 
     private val _files = MutableStateFlow<List<FileItem>>(emptyList())
     val files: StateFlow<List<FileItem>> = _files.asStateFlow()
+
+    private val _favoriteFolders = MutableStateFlow<List<FavoriteFolder>>(emptyList())
+    val favoriteFolders: StateFlow<List<FavoriteFolder>> = _favoriteFolders.asStateFlow()
 
     init {
         loadServers()
@@ -113,6 +117,14 @@ class SmbServiceViewModel @Inject constructor(
         viewModelScope.launch {
             scanDirectory(serverId, path)
         }
+    }
+
+    fun removeFavoriteFolder(id: Long) {
+
+    }
+
+    fun addFavoriteFolder(s: String, path: String, name: String) {
+
     }
 }
 

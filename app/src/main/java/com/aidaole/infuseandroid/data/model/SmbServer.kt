@@ -1,4 +1,4 @@
-package com.aidaole.infuseandroid.domain.model
+package com.aidaole.infuseandroid.data.model
 
 data class SmbServer(
     val id: String = "",

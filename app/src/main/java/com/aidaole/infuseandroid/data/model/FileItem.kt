@@ -1,4 +1,4 @@
-package com.aidaole.infuseandroid.domain.model
+package com.aidaole.infuseandroid.data.model
 
 sealed class FileItem {
     data class File(

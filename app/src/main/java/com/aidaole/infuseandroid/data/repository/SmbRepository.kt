@@ -1,7 +1,7 @@
-package com.aidaole.infuseandroid.domain.repository
+package com.aidaole.infuseandroid.data.repository
 
-import com.aidaole.infuseandroid.domain.model.FileItem
-import com.aidaole.infuseandroid.domain.model.SmbServer
+import com.aidaole.infuseandroid.data.model.FileItem
+import com.aidaole.infuseandroid.data.model.SmbServer
 import kotlinx.coroutines.flow.Flow
 
 interface SmbRepository {
