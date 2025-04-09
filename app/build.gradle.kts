@@ -4,6 +4,11 @@ plugins {
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.compose)
+    id("com.aidaole.easytrace")
+}
+
+easyTrace {
+    includeClasses = listOf("com.aidaole.infuseandroid.InfuseApplication")
 }
 
 android {
