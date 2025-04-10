@@ -35,10 +35,10 @@ fun AddServerItem(
     showDivider: Boolean = true,
     onClicked: () -> Unit = {}
 ) {
-    Row(
-        modifier = Modifier.clickable { onClicked() }.padding(horizontal = 10.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
+    Row(modifier = Modifier
+        .clickable { onClicked() }
+        .padding(horizontal = 10.dp),
+        verticalAlignment = Alignment.CenterVertically) {
         Icon(
             tint = Color.Unspecified,
             painter = serverIcon,
@@ -67,9 +67,7 @@ fun AddServerItem(
             Spacer(modifier = Modifier.weight(1f))
             if (showDivider) {
                 HorizontalDivider(
-                    modifier = Modifier.fillMaxWidth(),
-                    color = DividerColor,
-                    thickness = 1.dp
+                    modifier = Modifier.fillMaxWidth(), color = DividerColor, thickness = 1.dp
                 )
             }
         }

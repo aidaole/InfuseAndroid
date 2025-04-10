@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -54,6 +55,7 @@ import com.aidaole.infuseandroid.ui.widgets.ScreenTitle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.round
 
 @Composable
 fun ServerManageScreen(
@@ -224,7 +226,8 @@ private fun AddServerItems(
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+            .background(color = Color.White)
+            .clip(RoundedCornerShape(10.dp))
     ) {
         AddServerItem(text = "添加 SMB", serverIcon = painterResource(R.drawable.ic_smb), onClicked = {
             onItemClick(0)
@@ -246,7 +249,8 @@ private fun AddServerItems(
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+            .background(color = Color.White)
+            .clip(RoundedCornerShape(10.dp))
     ) {
         AddServerItem(text = "Aliyun", serverIcon = painterResource(R.drawable.ic_aliyun), onClicked = {
             onItemClick(1)
@@ -264,13 +268,13 @@ fun ServerItemView(
     Card(
         modifier = Modifier
             .padding(horizontal = 16.dp, vertical = 4.dp)
-            .fillMaxWidth()
-            .clickable { onItemClick() },
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(color = DividerColor)
+                .clickable { onItemClick() }
+                .clip(RoundedCornerShape(10.dp))
                 .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
