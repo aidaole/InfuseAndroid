@@ -39,7 +39,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aidaole.infuseandroid.ui.screen.home.HomeScreen
 import com.aidaole.infuseandroid.ui.screen.search.SearchScreen
-import com.aidaole.infuseandroid.ui.screen.servers.SmbServiceScreen
+import com.aidaole.infuseandroid.ui.screen.servers.ServerManageScreen
 import com.aidaole.infuseandroid.ui.screen.settings.SettingScreen
 import com.aidaole.infuseandroid.ui.theme.Orange
 
@@ -62,7 +62,7 @@ fun MainScreen() {
                 SearchScreen()
             }
             composable("server") {
-                SmbServiceScreen()
+                ServerManageScreen()
             }
             composable("settings") {
                 SettingScreen()

@@ -45,7 +45,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aidaole.infuseandroid.R
-import com.aidaole.infuseandroid.data.model.FavoriteFolder
+import com.aidaole.infuseandroid.data.entity.FavoriteFolderEntity
 import com.aidaole.infuseandroid.data.model.FileItem
 import com.aidaole.infuseandroid.data.model.SmbServer
 import com.aidaole.infuseandroid.ui.screen.servers.widgets.AddServerItem
@@ -56,7 +56,7 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun SmbServiceScreen(
+fun ServerManageScreen(
     viewModel: ServersManageViewModel = hiltViewModel()
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
@@ -299,7 +299,7 @@ fun ServerItemView(
 
 @Composable
 fun FavoriteFolderItem(
-    folder: FavoriteFolder, onItemClick: () -> Unit, onRemove: () -> Unit
+    folder: FavoriteFolderEntity, onItemClick: () -> Unit, onRemove: () -> Unit
 ) {
     Card(
         modifier = Modifier

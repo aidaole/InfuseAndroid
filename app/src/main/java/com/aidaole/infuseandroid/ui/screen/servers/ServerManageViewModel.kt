@@ -2,7 +2,7 @@ package com.aidaole.infuseandroid.ui.screen.servers
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.aidaole.infuseandroid.data.model.FavoriteFolder
+import com.aidaole.infuseandroid.data.entity.FavoriteFolderEntity
 import com.aidaole.infuseandroid.data.model.FileItem
 import com.aidaole.infuseandroid.data.model.SmbServer
 import com.aidaole.infuseandroid.data.repository.SmbRepository
@@ -31,8 +31,8 @@ class ServersManageViewModel @Inject constructor(
     private val _files = MutableStateFlow<List<FileItem>>(emptyList())
     val files: StateFlow<List<FileItem>> = _files.asStateFlow()
 
-    private val _favoriteFolders = MutableStateFlow<List<FavoriteFolder>>(emptyList())
-    val favoriteFolders: StateFlow<List<FavoriteFolder>> = _favoriteFolders.asStateFlow()
+    private val _favoriteFolders = MutableStateFlow<List<FavoriteFolderEntity>>(emptyList())
+    val favoriteFolders: StateFlow<List<FavoriteFolderEntity>> = _favoriteFolders.asStateFlow()
 
     init {
         loadServers()

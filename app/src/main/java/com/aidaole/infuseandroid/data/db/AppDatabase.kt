@@ -4,12 +4,12 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.aidaole.infuseandroid.data.dao.SmbServerDao
 import com.aidaole.infuseandroid.data.entity.SmbServerEntity
-import com.aidaole.infuseandroid.data.model.FavoriteFolder
+import com.aidaole.infuseandroid.data.entity.FavoriteFolderEntity
 
 @Database(
     entities = [
         SmbServerEntity::class,
-        FavoriteFolder::class
+        FavoriteFolderEntity::class
     ],
     version = 1,
     exportSchema = false
