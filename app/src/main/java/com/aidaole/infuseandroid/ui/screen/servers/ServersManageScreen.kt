@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.DeleteOutline
@@ -38,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -76,8 +78,6 @@ fun SmbServiceScreen(
         AddServerItems { id ->
             showAddDialog = true
         }
-        Spacer(modifier = Modifier.height(40.dp))
-
         when (uiState) {
             is SmbServiceUiState.Loading -> {
                 CircularProgressIndicator(
@@ -96,11 +96,17 @@ fun SmbServiceScreen(
             else -> {
                 LazyColumn {
                     item {
+                        Spacer(Modifier.height(16.dp))
+                    }
+                    item {
                         Text(
                             text = "已连接的服务器",
                             style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(16.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
+                    }
+                    item {
+                        Spacer(Modifier.height(16.dp))
                     }
                     items(servers) { server ->
                         ServerItemView(server = server,
@@ -212,16 +218,40 @@ fun SmbServiceScreen(
 private fun AddServerItems(
     onItemClick: (id: Int) -> Unit
 ) {
+    Text(
+        text = "网络共享", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(16.dp)
+    )
     Column(
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
     ) {
-        AddServerItem(text = "DiskStation(SMB)", serverIcon = painterResource(R.drawable.ic_smb), onClicked = {
+        AddServerItem(text = "添加 SMB", serverIcon = painterResource(R.drawable.ic_smb), onClicked = {
             onItemClick(0)
         })
+        AddServerItem(text = "添加 FTP", serverIcon = painterResource(R.drawable.ic_smb), onClicked = {
+            onItemClick(0)
+        })
+        AddServerItem(
+            text = "添加 NFS",
+            showDivider = false,
+            serverIcon = painterResource(R.drawable.ic_smb),
+            onClicked = {
+                onItemClick(0)
+            })
+    }
+    Text(
+        text = "云端服务", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(16.dp)
+    )
+    Column(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .background(color = Color.White, shape = RoundedCornerShape(10.dp))
+    ) {
         AddServerItem(text = "Aliyun", serverIcon = painterResource(R.drawable.ic_aliyun), onClicked = {
             onItemClick(1)
         })
-        AddServerItem("Box", serverIcon = painterResource(R.drawable.ic_box), onClicked = {
+        AddServerItem("Box", showDivider = false, serverIcon = painterResource(R.drawable.ic_box), onClicked = {
             onItemClick(2)
         })
     }

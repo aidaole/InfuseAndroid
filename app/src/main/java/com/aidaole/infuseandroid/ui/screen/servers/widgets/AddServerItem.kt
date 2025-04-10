@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
@@ -31,10 +32,11 @@ import com.aidaole.infuseandroid.ui.theme.IconHintColor
 fun AddServerItem(
     text: String = "ServerName",
     serverIcon: Painter = painterResource(R.drawable.ic_smb),
+    showDivider: Boolean = true,
     onClicked: () -> Unit = {}
 ) {
     Row(
-        modifier = Modifier.clickable { onClicked() },
+        modifier = Modifier.clickable { onClicked() }.padding(horizontal = 10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -63,11 +65,13 @@ fun AddServerItem(
                 )
             }
             Spacer(modifier = Modifier.weight(1f))
-            HorizontalDivider(
-                modifier = Modifier.fillMaxWidth(),
-                color = DividerColor,
-                thickness = 1.dp
-            )
+            if (showDivider) {
+                HorizontalDivider(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = DividerColor,
+                    thickness = 1.dp
+                )
+            }
         }
 
     }
