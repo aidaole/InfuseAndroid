@@ -1,6 +1,7 @@
 package com.aidaole.infuseandroid.di
 
 import com.aidaole.infuseandroid.data.repository.SmbRepository
+import com.aidaole.infuseandroid.data.repository.SmbRepositoryFake
 import com.aidaole.infuseandroid.data.repository.SmbRepositoryImpl
 import dagger.Binds
 import dagger.Module
@@ -14,6 +15,6 @@ abstract class AppModule {
     @Binds
     @Singleton
     abstract fun bindSmbRepository(
-        repository: SmbRepositoryImpl
+        repository: SmbRepositoryFake
     ): SmbRepository
 } 

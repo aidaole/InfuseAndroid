@@ -23,3 +23,4 @@ val Warning = Color(0xFFFFC107) // 警告（黄色）
 
 val IconHintColor = Color(0xFF8C8C8C)
 
+val DividerColor = Color(0xFFE0E0E1)

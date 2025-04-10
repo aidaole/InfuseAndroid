@@ -1,4 +1,4 @@
-package com.aidaole.infuseandroid.ui.screen.servers
+package com.aidaole.infuseandroid.ui.screen.servers.widgets
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.sharp.Edit
+import androidx.compose.material.icons.sharp.Add
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.aidaole.infuseandroid.R
+import com.aidaole.infuseandroid.ui.theme.DividerColor
 import com.aidaole.infuseandroid.ui.theme.IconHintColor
 
 @Composable
@@ -56,7 +57,7 @@ fun AddServerItem(
                 Spacer(modifier = Modifier.weight(1f))
                 Icon(
                     tint = IconHintColor,
-                    imageVector = Icons.Sharp.Edit,
+                    imageVector = Icons.Sharp.Add,
                     contentDescription = "Add Server",
                     modifier = Modifier.size(16.dp)
                 )
@@ -64,7 +65,7 @@ fun AddServerItem(
             Spacer(modifier = Modifier.weight(1f))
             HorizontalDivider(
                 modifier = Modifier.fillMaxWidth(),
-                color = Color(0xFFE0E0E1),
+                color = DividerColor,
                 thickness = 1.dp
             )
         }

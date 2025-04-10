@@ -69,7 +69,34 @@ class ServersManageViewModel @Inject constructor(
         }
     }
 
-    fun connectToServer(server: SmbServer) {
+
+    fun removeServer(serverId: String) {
+        viewModelScope.launch {
+            _uiState.value = SmbServiceUiState.Loading
+            try {
+                repository.removeServer(serverId)
+                _uiState.value = SmbServiceUiState.Success
+            } catch (e: Exception) {
+                _uiState.value = SmbServiceUiState.Error(e.message ?: "Failed to remove server")
+            }
+        }
+    }
+
+    fun navigateToDirectory(serverId: String, path: String) {
+        viewModelScope.launch {
+            scanDirectory(serverId, path)
+        }
+    }
+
+    fun removeFavoriteFolder(id: Long) {
+
+    }
+
+    fun addFavoriteFolder(s: String, path: String, name: String) {
+
+    }
+
+    fun openServer(server: SmbServer) {
         viewModelScope.launch {
             _uiState.value = SmbServiceUiState.Loading
             try {
@@ -87,18 +114,6 @@ class ServersManageViewModel @Inject constructor(
         }
     }
 
-    fun removeServer(serverId: String) {
-        viewModelScope.launch {
-            _uiState.value = SmbServiceUiState.Loading
-            try {
-                repository.removeServer(serverId)
-                _uiState.value = SmbServiceUiState.Success
-            } catch (e: Exception) {
-                _uiState.value = SmbServiceUiState.Error(e.message ?: "Failed to remove server")
-            }
-        }
-    }
-
     private fun scanDirectory(serverId: String, path: String) {
         viewModelScope.launch {
             _uiState.value = SmbServiceUiState.Loading
@@ -111,20 +126,6 @@ class ServersManageViewModel @Inject constructor(
                 _uiState.value = SmbServiceUiState.Error(e.message ?: "Failed to scan directory")
             }
         }
-    }
-
-    fun navigateToDirectory(serverId: String, path: String) {
-        viewModelScope.launch {
-            scanDirectory(serverId, path)
-        }
-    }
-
-    fun removeFavoriteFolder(id: Long) {
-
-    }
-
-    fun addFavoriteFolder(s: String, path: String, name: String) {
-
     }
 }
 
