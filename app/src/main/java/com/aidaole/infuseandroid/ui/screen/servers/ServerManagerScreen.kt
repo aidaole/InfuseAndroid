@@ -45,6 +45,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.compose.rememberNavController
 import com.aidaole.infuseandroid.R
 import com.aidaole.infuseandroid.data.entity.FavoriteFolderEntity
 import com.aidaole.infuseandroid.data.model.FileItem
