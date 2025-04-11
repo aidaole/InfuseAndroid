@@ -45,13 +45,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.compose.rememberNavController
 import com.aidaole.infuseandroid.R
 import com.aidaole.infuseandroid.data.entity.FavoriteFolderEntity
 import com.aidaole.infuseandroid.data.model.FileItem
 import com.aidaole.infuseandroid.data.model.SmbServer
 import com.aidaole.infuseandroid.ui.screen.servers.widgets.AddServerItem
+import com.aidaole.infuseandroid.ui.theme.AppTheme
 import com.aidaole.infuseandroid.ui.theme.DividerColor
+import com.aidaole.infuseandroid.ui.theme.LocalExtendedColors
 import com.aidaole.infuseandroid.ui.widgets.ScreenTitle
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -60,7 +61,7 @@ import kotlin.math.round
 
 @Composable
 fun ServerManageScreen(
-    viewModel: ServersManageViewModel = hiltViewModel()
+    viewModel: ServerManageViewModel = hiltViewModel()
 ) {
     var showAddDialog by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf("") }
@@ -227,7 +228,7 @@ private fun AddServerItems(
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .background(color = Color.White)
+            .background(color = AppTheme.extendedColors.addServerItem, shape = RoundedCornerShape(10.dp))
             .clip(RoundedCornerShape(10.dp))
     ) {
         AddServerItem(text = "添加 SMB", serverIcon = painterResource(R.drawable.ic_smb), onClicked = {
@@ -250,7 +251,7 @@ private fun AddServerItems(
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .background(color = Color.White)
+            .background(color = AppTheme.extendedColors.addServerItem, shape = RoundedCornerShape(10.dp))
             .clip(RoundedCornerShape(10.dp))
     ) {
         AddServerItem(text = "Aliyun", serverIcon = painterResource(R.drawable.ic_aliyun), onClicked = {
@@ -273,7 +274,7 @@ fun ServerItemView(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color = DividerColor)
+                .background(color = AppTheme.extendedColors.addServerItem)
                 .clickable { onItemClick() }
                 .clip(RoundedCornerShape(10.dp))
                 .padding(16.dp),

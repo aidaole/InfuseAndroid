@@ -15,7 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ServersManageViewModel @Inject constructor(
+class ServerManageViewModel @Inject constructor(
     private val repository: SmbRepository
 ) : ViewModel() {
 

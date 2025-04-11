@@ -6,7 +6,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.graphics.Color
 
 private val LightColorScheme = lightColorScheme(
@@ -19,10 +19,10 @@ private val LightColorScheme = lightColorScheme(
     onSecondary = Color.White,
     
     background = Background,
-    onBackground = TextPrimary,
+    onBackground = Color.Black,
     
-    surface = Surface,
-    onSurface = TextPrimary,
+    surface = Color.LightGray,
+    onSurface = Color.Black,
     
     error = Error,
     onError = Color.White
@@ -40,7 +40,7 @@ private val DarkColorScheme = darkColorScheme(
     background = Color(0xFF121212),
     onBackground = Color.White,
     
-    surface = Color(0xFF1E1E1E),
+    surface = Color.DarkGray,
     onSurface = Color.White,
     
     error = Error,
@@ -49,18 +49,35 @@ private val DarkColorScheme = darkColorScheme(
 
 @Composable
 fun InfuseAndroidTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = if (darkTheme) {
+    val materialColorScheme = if (useDarkTheme) {
         DarkColorScheme
     } else {
         LightColorScheme
     }
-    
-    MaterialTheme(
-        colorScheme = colorScheme,
-        typography = Typography,
-        content = content
-    )
+    // 扩展颜色属性
+    val extendedColors = if (useDarkTheme) {
+        DarkExtendedColors
+    } else {
+        LightExtendedColors
+    }
+    CompositionLocalProvider(
+        LocalExtendedColors provides extendedColors
+    ) {
+        MaterialTheme(
+            colorScheme = materialColorScheme,
+            typography = MaterialTheme.typography,
+            shapes = MaterialTheme.shapes,
+            content = content
+        )
+    }
+}
+
+object AppTheme {
+    val extendedColors: ExtendedColors
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalExtendedColors.current
 }

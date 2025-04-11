@@ -28,9 +28,10 @@ import androidx.navigation.NavHostController
 import com.aidaole.infuseandroid.R
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import com.aidaole.infuseandroid.ui.widgets.ScreenTitle
 
 @OptIn(
-    ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class
+    androidx.compose.foundation.ExperimentalFoundationApi::class
 )
 @Composable
 fun HomeScreen(navController: NavHostController) {
@@ -62,9 +63,7 @@ fun HomeTopBar() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(
-            text = "主屏幕", fontSize = 24.sp, fontWeight = FontWeight.Bold
-        )
+        ScreenTitle("主屏幕")
         Row {
             IconButton(onClick = { /* TODO */ }) {
                 Icon(Icons.Default.Done, contentDescription = "下载")
@@ -125,8 +124,8 @@ fun RecentlyAddedSection() {
                     modifier = Modifier
                         .width(120.dp)
                         .height(180.dp)
+                        .background(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(8.dp))
                         .clip(RoundedCornerShape(8.dp))
-                        .background(Color.LightGray)
                 )
             }
         }
@@ -172,11 +171,12 @@ fun CategoryItem(
     Box(
         modifier = modifier
             .height(100.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(Color.LightGray), contentAlignment = Alignment.Center
+            .background(color = MaterialTheme.colorScheme.surface, shape = RoundedCornerShape(8.dp))
+            .clip(RoundedCornerShape(8.dp)),
+        contentAlignment = Alignment.Center
     ) {
         Text(
-            text = title, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold
+            text = title, fontSize = 18.sp, fontWeight = FontWeight.Bold
         )
     }
 }

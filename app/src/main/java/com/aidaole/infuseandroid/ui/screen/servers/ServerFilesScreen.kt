@@ -8,7 +8,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 
 @Composable
 fun ServerFilesScreen(
-    serversManageViewModel: ServersManageViewModel = hiltViewModel()
+    serverManageViewModel: ServerManageViewModel = hiltViewModel()
 ) {
 
     Column {

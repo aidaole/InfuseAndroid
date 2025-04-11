@@ -12,6 +12,7 @@ fun ScreenTitle(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.headlineMedium,
+        color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(16.dp)
     )
 }
