@@ -19,9 +19,9 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material.icons.outlined.Settings
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -45,7 +45,6 @@ import com.aidaole.infuseandroid.ui.theme.Orange
 
 
 // 主屏幕
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
@@ -86,7 +85,7 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
                 .fillMaxWidth()
                 .height(60.dp)
                 .shadow(elevation = 8.dp, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
         ) {
             Row(
