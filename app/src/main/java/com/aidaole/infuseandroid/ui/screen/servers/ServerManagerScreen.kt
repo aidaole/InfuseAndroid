@@ -22,65 +22,69 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material.icons.filled.InsertDriveFile
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.VideoFile
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.aidaole.infuseandroid.R
 import com.aidaole.infuseandroid.data.entity.FavoriteFolderEntity
 import com.aidaole.infuseandroid.data.model.FileItem
 import com.aidaole.infuseandroid.data.model.SmbServer
 import com.aidaole.infuseandroid.ui.screen.servers.widgets.AddServerItem
 import com.aidaole.infuseandroid.ui.theme.AppTheme
-import com.aidaole.infuseandroid.ui.theme.DividerColor
-import com.aidaole.infuseandroid.ui.theme.LocalExtendedColors
-import com.aidaole.infuseandroid.ui.widgets.ScreenTitle
+import com.aidaole.infuseandroid.ui.widgets.MainScreenTitle
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import kotlin.math.round
 
 @Composable
-fun ServerManageScreen(
-    viewModel: ServerManageViewModel = hiltViewModel()
-) {
-    var showAddDialog by remember { mutableStateOf(false) }
-    var name by remember { mutableStateOf("") }
-    var host by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+fun ServerManageScreen() {
+    val navController = rememberNavController()
 
+    NavHost(navController, startDestination = "allServers") {
+        composable("allServers") {
+            AllServerScreen(
+                navController = navController
+            )
+        }
+        composable("addSmbServer") {
+            AddSmbServerScreen()
+        }
+    }
+}
+
+@Composable
+private fun AllServerScreen(
+    viewModel: ServerManageViewModel = hiltViewModel(),
+    navController: NavController
+) {
     val uiState by viewModel.uiState.collectAsState()
     val servers by viewModel.servers.collectAsState()
     val currentPath by viewModel.currentPath.collectAsState()
     val files by viewModel.files.collectAsState()
     val favoriteFolders by viewModel.favoriteFolders.collectAsState()
-
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        ScreenTitle(text = "服务器")
+        MainScreenTitle(text = "服务器")
         AddServerItems { id ->
-            showAddDialog = true
+            navController.navigate("addSmbServer")
         }
         when (uiState) {
             is SmbServiceUiState.Loading -> {
@@ -129,7 +133,12 @@ fun ServerManageScreen(
 
                         items(favoriteFolders) { folder ->
                             FavoriteFolderItem(folder = folder,
-                                onItemClick = { viewModel.navigateToDirectory(folder.serverId, folder.path) },
+                                onItemClick = {
+                                    viewModel.navigateToDirectory(
+                                        folder.serverId,
+                                        folder.path
+                                    )
+                                },
                                 onRemove = { viewModel.removeFavoriteFolder(folder.id) })
                         }
                     }
@@ -148,7 +157,8 @@ fun ServerManageScreen(
                                 when (item) {
                                     is FileItem.Directory -> {
                                         viewModel.navigateToDirectory(
-                                            servers.firstOrNull { it.isConnected }?.id ?: return@FileItem, item.path
+                                            servers.firstOrNull { it.isConnected }?.id
+                                                ?: return@FileItem, item.path
                                         )
                                     }
 
@@ -159,7 +169,8 @@ fun ServerManageScreen(
                             }, onFavorite = {
                                 if (item is FileItem.Directory) {
                                     viewModel.addFavoriteFolder(
-                                        servers.firstOrNull { it.isConnected }?.id ?: return@FileItem,
+                                        servers.firstOrNull { it.isConnected }?.id
+                                            ?: return@FileItem,
                                         item.path,
                                         item.name
                                     )
@@ -172,50 +183,6 @@ fun ServerManageScreen(
         }
     }
 
-    if (showAddDialog) {
-        AlertDialog(onDismissRequest = { showAddDialog = false }, title = { Text("Add SMB Server") }, text = {
-            Column {
-                OutlinedTextField(value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(value = host,
-                    onValueChange = { host = it },
-                    label = { Text("Host (e.g. 192.168.1.100)") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(value = username,
-                    onValueChange = { username = it },
-                    label = { Text("Username") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Password") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }, confirmButton = {
-            TextButton(onClick = {
-                viewModel.addServer(name, host, username, password)
-                showAddDialog = false
-                name = ""
-                host = ""
-                username = ""
-                password = ""
-            }) {
-                Text("Add")
-            }
-        }, dismissButton = {
-            TextButton(onClick = { showAddDialog = false }) {
-                Text("Cancel")
-            }
-        })
-    }
 }
 
 @Composable
@@ -223,20 +190,31 @@ private fun AddServerItems(
     onItemClick: (id: Int) -> Unit
 ) {
     Text(
-        text = "网络共享", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(16.dp)
+        text = "网络共享",
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(16.dp)
     )
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .background(color = AppTheme.extendedColors.addServerItem, shape = RoundedCornerShape(10.dp))
+            .background(
+                color = AppTheme.extendedColors.addServerItem,
+                shape = RoundedCornerShape(10.dp)
+            )
             .clip(RoundedCornerShape(10.dp))
     ) {
-        AddServerItem(text = "添加 SMB", serverIcon = painterResource(R.drawable.ic_smb), onClicked = {
-            onItemClick(0)
-        })
-        AddServerItem(text = "添加 FTP", serverIcon = painterResource(R.drawable.ic_smb), onClicked = {
-            onItemClick(0)
-        })
+        AddServerItem(
+            text = "添加 SMB",
+            serverIcon = painterResource(R.drawable.ic_smb),
+            onClicked = {
+                onItemClick(0)
+            })
+        AddServerItem(
+            text = "添加 FTP",
+            serverIcon = painterResource(R.drawable.ic_smb),
+            onClicked = {
+                onItemClick(0)
+            })
         AddServerItem(
             text = "添加 NFS",
             showDivider = false,
@@ -246,20 +224,32 @@ private fun AddServerItems(
             })
     }
     Text(
-        text = "云端服务", style = MaterialTheme.typography.titleMedium, modifier = Modifier.padding(16.dp)
+        text = "云端服务",
+        style = MaterialTheme.typography.titleMedium,
+        modifier = Modifier.padding(16.dp)
     )
     Column(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-            .background(color = AppTheme.extendedColors.addServerItem, shape = RoundedCornerShape(10.dp))
+            .background(
+                color = AppTheme.extendedColors.addServerItem,
+                shape = RoundedCornerShape(10.dp)
+            )
             .clip(RoundedCornerShape(10.dp))
     ) {
-        AddServerItem(text = "Aliyun", serverIcon = painterResource(R.drawable.ic_aliyun), onClicked = {
-            onItemClick(1)
-        })
-        AddServerItem("Box", showDivider = false, serverIcon = painterResource(R.drawable.ic_box), onClicked = {
-            onItemClick(2)
-        })
+        AddServerItem(
+            text = "Aliyun",
+            serverIcon = painterResource(R.drawable.ic_aliyun),
+            onClicked = {
+                onItemClick(1)
+            })
+        AddServerItem(
+            "Box",
+            showDivider = false,
+            serverIcon = painterResource(R.drawable.ic_box),
+            onClicked = {
+                onItemClick(2)
+            })
     }
 }
 
@@ -361,13 +351,18 @@ fun FileItem(
                     text = when (item) {
                         is FileItem.Directory -> item.name
                         is FileItem.File -> item.name
-                    }, style = MaterialTheme.typography.bodyLarge, maxLines = 1, overflow = TextOverflow.Ellipsis
+                    },
+                    style = MaterialTheme.typography.bodyLarge,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Text(
                     text = when (item) {
                         is FileItem.Directory -> "Directory"
                         is FileItem.File -> formatFileSize(item.size)
-                    }, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant
+                    },
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             if (item is FileItem.Directory) {
@@ -379,7 +374,9 @@ fun FileItem(
                 text = when (item) {
                     is FileItem.Directory -> formatDate(item.lastModified)
                     is FileItem.File -> formatDate(item.lastModified)
-                }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }

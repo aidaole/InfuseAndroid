@@ -24,13 +24,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.aidaole.infuseandroid.ui.theme.Orange
-import com.aidaole.infuseandroid.ui.widgets.ScreenTitle
+import com.aidaole.infuseandroid.ui.widgets.MainScreenTitle
 
 @Composable
 fun PosterScreen() {
     // 分类选项卡
     var selectedTabIndex by remember { mutableStateOf(0) }
-    ScreenTitle(
+    MainScreenTitle(
         "发现"
     )
     TabRow(

@@ -8,11 +8,21 @@ import androidx.compose.ui.unit.dp
 import androidx.tv.material3.Text
 
 @Composable
-fun ScreenTitle(text: String) {
+fun MainScreenTitle(text: String) {
     Text(
         text = text,
         style = MaterialTheme.typography.headlineMedium,
         color = MaterialTheme.colorScheme.onBackground,
         modifier = Modifier.padding(16.dp)
+    )
+}
+
+@Composable
+fun SubScreenTitle(text: String, modifier: Modifier) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleLarge,
+        color = MaterialTheme.colorScheme.onBackground,
+        modifier = modifier.padding(16.dp)
     )
 }
