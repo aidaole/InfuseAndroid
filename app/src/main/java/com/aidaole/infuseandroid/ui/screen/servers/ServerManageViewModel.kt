@@ -1,7 +1,9 @@
 package com.aidaole.infuseandroid.ui.screen.servers
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.aidaole.infuseandroid.data.entity.FavoriteFolderEntity
 import com.aidaole.infuseandroid.data.model.FileItem
 import com.aidaole.infuseandroid.data.model.SmbServer
@@ -18,6 +20,12 @@ import javax.inject.Inject
 class ServerManageViewModel @Inject constructor(
     private val repository: SmbRepository
 ) : ViewModel() {
+    companion object {
+        private const val TAG = "ServerManageViewModel"
+    }
+
+    private val _selectSmbServer =  MutableStateFlow<SmbServer?>(null)
+    val selectSmbServer: StateFlow<SmbServer?> = _selectSmbServer.asStateFlow()
 
     private val _uiState = MutableStateFlow<SmbServiceUiState>(SmbServiceUiState.Initial)
     val uiState: StateFlow<SmbServiceUiState> = _uiState.asStateFlow()
@@ -96,20 +104,20 @@ class ServerManageViewModel @Inject constructor(
 
     }
 
-    fun openServer(server: SmbServer) {
+    fun openServer(server: SmbServer, navController: NavController) {
         viewModelScope.launch {
-            _uiState.value = SmbServiceUiState.Loading
             try {
                 val success = repository.connectToServer(server)
                 if (success) {
-                    _uiState.value = SmbServiceUiState.Success
                     // 连接成功后自动扫描根目录
-                    scanDirectory(server.id, "/")
+                    _selectSmbServer.emit(server)
+                    Log.d(TAG, "openServer: $server")
+                    navController.navigate("serverFilesScreen")
                 } else {
-                    _uiState.value = SmbServiceUiState.Error("Failed to connect to server")
+                    _selectSmbServer.value = null
                 }
             } catch (e: Exception) {
-                _uiState.value = SmbServiceUiState.Error(e.message ?: "Failed to connect to server")
+                _selectSmbServer.value = null
             }
         }
     }

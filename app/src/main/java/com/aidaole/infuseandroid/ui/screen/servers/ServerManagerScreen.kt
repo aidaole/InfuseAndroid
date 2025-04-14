@@ -69,6 +69,13 @@ fun ServerManageScreen() {
                 onAddServerClick = { navController.popBackStack() }
             )
         }
+        composable("serverFilesScreen") {
+            ServerFilesScreen(
+                onOpenServerFailed = {
+//                    navController.popBackStack()
+                }
+            )
+        }
     }
 }
 
@@ -121,7 +128,9 @@ private fun AllServerScreen(
                     }
                     items(servers) { server ->
                         ServerItemView(server = server,
-                            onItemClick = { viewModel.openServer(server) },
+                            onItemClick = {
+                                viewModel.openServer(server, navController)
+                            },
                             onRemoveClick = { viewModel.removeServer(server.id) })
                     }
 
