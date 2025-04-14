@@ -39,31 +39,40 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.aidaole.infuseandroid.ui.screen.home.HomeScreen
 import com.aidaole.infuseandroid.ui.screen.search.SearchScreen
-import com.aidaole.infuseandroid.ui.screen.servers.ServerManageScreen
+import com.aidaole.infuseandroid.ui.screen.servers.ServersNavGraph
 import com.aidaole.infuseandroid.ui.screen.settings.SettingScreen
 import com.aidaole.infuseandroid.ui.theme.Orange
 
+object MainScreenDestinations {
+    const val HOME = "home"
+    const val SEARCH = "search"
+    const val SERVER = "server"
+    const val SETTINGS = "settings"
+}
 
 // 主屏幕
 @Composable
-fun MainScreen() {
-    val navController = rememberNavController()
+fun MainNavGraph(appNavController: NavHostController) {
+    val mainNavController = rememberNavController()
+
     Scaffold(bottomBar = {
-        CustomBottomNavigationBar(navController = navController)
+        CustomBottomNavigationBar(navController = mainNavController)
     }) { padding ->
         NavHost(
-            navController = navController, startDestination = "home", modifier = Modifier.padding(padding)
+            navController = mainNavController,
+            startDestination = MainScreenDestinations.HOME,
+            modifier = Modifier.padding(padding)
         ) {
-            composable("home") {
-                HomeScreen(navController)
+            composable(MainScreenDestinations.HOME) {
+                HomeScreen(mainNavController)
             }
-            composable("search") {
+            composable(MainScreenDestinations.SEARCH) {
                 SearchScreen()
             }
-            composable("server") {
-                ServerManageScreen()
+            composable(MainScreenDestinations.SERVER) {
+                ServersNavGraph(mainNavController)
             }
-            composable("settings") {
+            composable(MainScreenDestinations.SETTINGS) {
                 SettingScreen()
             }
         }
@@ -84,7 +93,9 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp)
-                .shadow(elevation = 8.dp, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)),
+                .shadow(
+                    elevation = 8.dp, shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+                ),
             color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
         ) {
@@ -97,51 +108,51 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 // 首页按钮
-                val homeSelected = currentRoute == "home"
+                val homeSelected = currentRoute == MainScreenDestinations.HOME
                 NavigationItem(icon = if (homeSelected) Icons.Filled.PlayArrow else Icons.Outlined.PlayArrow,
                     label = "首页",
                     selected = homeSelected,
                     onClick = {
-                        if (currentRoute != "home") {
-                            navigateWithNoAnimation(navController, "home")
+                        if (currentRoute != MainScreenDestinations.HOME) {
+                            navigateWithNoAnimation(navController, MainScreenDestinations.HOME)
                         }
                     })
 
                 // 搜索按钮
-                val searchSelected = currentRoute == "search"
+                val searchSelected = currentRoute == MainScreenDestinations.SEARCH
                 NavigationItem(
                     icon = if (searchSelected) Icons.Filled.Search else Icons.Outlined.Search,
                     label = "搜索",
                     selected = searchSelected,
                     onClick = {
-                        if (currentRoute != "search") {
-                            navigateWithNoAnimation(navController, "search")
+                        if (currentRoute != MainScreenDestinations.SEARCH) {
+                            navigateWithNoAnimation(navController, MainScreenDestinations.SEARCH)
                         }
                     },
                 )
 
                 // 文件按钮
-                val serverSelected = currentRoute == "server"
+                val serverSelected = currentRoute == MainScreenDestinations.SERVER
                 NavigationItem(
                     icon = if (serverSelected) Icons.Filled.Folder else Icons.Outlined.Folder,
                     label = "文件",
                     selected = serverSelected,
                     onClick = {
-                        if (currentRoute != "server") {
-                            navigateWithNoAnimation(navController, "server")
+                        if (currentRoute != MainScreenDestinations.SERVER) {
+                            navigateWithNoAnimation(navController, MainScreenDestinations.SERVER)
                         }
                     },
                 )
 
                 // 设置按钮
-                val settingsSelected = currentRoute == "settings"
+                val settingsSelected = currentRoute == MainScreenDestinations.SETTINGS
                 NavigationItem(
                     icon = if (settingsSelected) Icons.Filled.Settings else Icons.Outlined.Settings,
                     label = "设置",
                     selected = settingsSelected,
                     onClick = {
-                        if (currentRoute != "settings") {
-                            navigateWithNoAnimation(navController, "settings")
+                        if (currentRoute != MainScreenDestinations.SETTINGS) {
+                            navigateWithNoAnimation(navController, MainScreenDestinations.SETTINGS)
                         }
                     },
                 )
@@ -152,7 +163,11 @@ fun CustomBottomNavigationBar(navController: NavHostController) {
 
 @Composable
 fun NavigationItem(
-    icon: ImageVector, label: String, selected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier
+    icon: ImageVector,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally, modifier = modifier
@@ -172,7 +187,6 @@ fun NavigationItem(
 
 fun navigateWithNoAnimation(navController: NavHostController, route: String) {
     navController.navigate(route) {
-//        popUpTo(navController.graph.startDestinationId)
         launchSingleTop = true
         anim {
             this.enter = 0

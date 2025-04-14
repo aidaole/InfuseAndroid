@@ -1,5 +1,6 @@
 package com.aidaole.infuseandroid.ui.screen.servers
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -39,6 +40,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -53,257 +55,52 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@Composable
-fun ServerManageScreen() {
-    val navController = rememberNavController()
+object ServersDestinations {
+    const val ALL_SERVERS = "server_all"
+    const val ADD_SMB_SERVER = "server_add"
+    const val SERVER_FILES = "server_files"
+}
 
-    NavHost(navController, startDestination = "allServers") {
-        composable("allServers") {
+@SuppressLint("UnrememberedGetBackStackEntry")
+@Composable
+fun ServersNavGraph(mainNavController: NavHostController) {
+
+    val serverNavController = rememberNavController()
+    val serverManageViewModel: ServerManageViewModel = hiltViewModel()
+
+    NavHost(
+        navController = serverNavController,
+        startDestination = ServersDestinations.ALL_SERVERS
+    ) {
+        composable(ServersDestinations.ALL_SERVERS) {
             AllServerScreen(
-                navController = navController
+                serverManageViewModel = serverManageViewModel,
+                onAddServerClick = {
+                    serverNavController.navigate(ServersDestinations.ADD_SMB_SERVER)
+                },
+                onServerItemClick = { server ->
+                    serverManageViewModel.openServer(server, serverNavController)
+                }
             )
         }
-        composable("addSmbServer") {
+        composable(ServersDestinations.ADD_SMB_SERVER) {
             AddSmbServerScreen(
-                onBackClick = { navController.popBackStack() },
-                onAddServerClick = { navController.popBackStack() }
+                serverManageViewModel = serverManageViewModel,
+                onBackClick = { serverNavController.popBackStack() },
+                onAddServerClick = { serverNavController.popBackStack() }
             )
         }
-        composable("serverFilesScreen") {
+        composable(ServersDestinations.SERVER_FILES) {
             ServerFilesScreen(
+                serverManageViewModel = serverManageViewModel,
                 onOpenServerFailed = {
-//                    navController.popBackStack()
+                    serverNavController.popBackStack()
                 }
             )
         }
     }
 }
 
-@Composable
-private fun AllServerScreen(
-    viewModel: ServerManageViewModel = hiltViewModel(),
-    navController: NavController
-) {
-    val uiState by viewModel.uiState.collectAsState()
-    val servers by viewModel.servers.collectAsState()
-    val currentPath by viewModel.currentPath.collectAsState()
-    val files by viewModel.files.collectAsState()
-    val favoriteFolders by viewModel.favoriteFolders.collectAsState()
-    Column(
-        modifier = Modifier.fillMaxSize()
-    ) {
-        MainScreenTitle(text = "服务器")
-        AddServerItems { id ->
-            navController.navigate("addSmbServer")
-        }
-        when (uiState) {
-            is SmbServiceUiState.Loading -> {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-            }
-
-            is SmbServiceUiState.Error -> {
-                Text(
-                    text = (uiState as SmbServiceUiState.Error).message,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-
-            else -> {
-                LazyColumn {
-                    item {
-                        Spacer(Modifier.height(16.dp))
-                    }
-                    item {
-                        Text(
-                            text = "已连接的服务器",
-                            style = MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.padding(horizontal = 16.dp)
-                        )
-                    }
-                    item {
-                        Spacer(Modifier.height(16.dp))
-                    }
-                    items(servers) { server ->
-                        ServerItemView(server = server,
-                            onItemClick = {
-                                viewModel.openServer(server, navController)
-                            },
-                            onRemoveClick = { viewModel.removeServer(server.id) })
-                    }
-
-                    if (favoriteFolders.isNotEmpty()) {
-                        item {
-                            Text(
-                                text = "已存储的共享",
-                                style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
-
-                        items(favoriteFolders) { folder ->
-                            FavoriteFolderItem(folder = folder,
-                                onItemClick = {
-                                    viewModel.navigateToDirectory(
-                                        folder.serverId,
-                                        folder.path
-                                    )
-                                },
-                                onRemove = { viewModel.removeFavoriteFolder(folder.id) })
-                        }
-                    }
-
-                    if (files.isNotEmpty()) {
-                        item {
-                            Text(
-                                text = "Current Path: $currentPath",
-                                style = MaterialTheme.typography.titleMedium,
-                                modifier = Modifier.padding(vertical = 8.dp)
-                            )
-                        }
-
-                        items(files) { item ->
-                            FileItem(item = item, onItemClick = {
-                                when (item) {
-                                    is FileItem.Directory -> {
-                                        viewModel.navigateToDirectory(
-                                            servers.firstOrNull { it.isConnected }?.id
-                                                ?: return@FileItem, item.path
-                                        )
-                                    }
-
-                                    is FileItem.File -> {
-                                        Log.d("SmbServiceScreen", "SmbServiceScreen: ${item.name}")
-                                    }
-                                }
-                            }, onFavorite = {
-                                if (item is FileItem.Directory) {
-                                    viewModel.addFavoriteFolder(
-                                        servers.firstOrNull { it.isConnected }?.id
-                                            ?: return@FileItem,
-                                        item.path,
-                                        item.name
-                                    )
-                                }
-                            })
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-}
-
-@Composable
-private fun AddServerItems(
-    onItemClick: (id: Int) -> Unit
-) {
-    Text(
-        text = "网络共享",
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(16.dp)
-    )
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .background(
-                color = AppTheme.extendedColors.addServerItem,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .clip(RoundedCornerShape(10.dp))
-    ) {
-        AddServerItem(
-            text = "添加 SMB",
-            serverIcon = painterResource(R.drawable.ic_smb),
-            onClicked = {
-                onItemClick(0)
-            })
-        AddServerItem(
-            text = "添加 FTP",
-            serverIcon = painterResource(R.drawable.ic_smb),
-            onClicked = {
-                onItemClick(0)
-            })
-        AddServerItem(
-            text = "添加 NFS",
-            showDivider = false,
-            serverIcon = painterResource(R.drawable.ic_smb),
-            onClicked = {
-                onItemClick(0)
-            })
-    }
-    Text(
-        text = "云端服务",
-        style = MaterialTheme.typography.titleMedium,
-        modifier = Modifier.padding(16.dp)
-    )
-    Column(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .background(
-                color = AppTheme.extendedColors.addServerItem,
-                shape = RoundedCornerShape(10.dp)
-            )
-            .clip(RoundedCornerShape(10.dp))
-    ) {
-        AddServerItem(
-            text = "Aliyun",
-            serverIcon = painterResource(R.drawable.ic_aliyun),
-            onClicked = {
-                onItemClick(1)
-            })
-        AddServerItem(
-            "Box",
-            showDivider = false,
-            serverIcon = painterResource(R.drawable.ic_box),
-            onClicked = {
-                onItemClick(2)
-            })
-    }
-}
-
-@Composable
-fun ServerItemView(
-    server: SmbServer, onItemClick: () -> Unit, onRemoveClick: () -> Unit
-) {
-    Card(
-        modifier = Modifier
-            .padding(horizontal = 16.dp, vertical = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = AppTheme.extendedColors.addServerItem)
-                .clickable { onItemClick() }
-                .clip(RoundedCornerShape(10.dp))
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = server.name, style = MaterialTheme.typography.titleLarge
-                )
-                Spacer(modifier = Modifier.height(6.dp))
-                Text(
-                    text = server.host, style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            Row {
-                IconButton(onClick = onRemoveClick) {
-                    Icon(
-                        imageVector = Icons.Default.DeleteOutline,
-                        contentDescription = "Delete",
-                        modifier = Modifier.size(26.dp)
-                    )
-                }
-            }
-        }
-    }
-}
 
 @Composable
 fun FavoriteFolderItem(

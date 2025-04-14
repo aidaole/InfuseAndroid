@@ -104,7 +104,7 @@ class ServerManageViewModel @Inject constructor(
 
     }
 
-    fun openServer(server: SmbServer, navController: NavController) {
+    fun openServer(server: SmbServer, serverNavController: NavController) {
         viewModelScope.launch {
             try {
                 val success = repository.connectToServer(server)
@@ -112,7 +112,7 @@ class ServerManageViewModel @Inject constructor(
                     // 连接成功后自动扫描根目录
                     _selectSmbServer.emit(server)
                     Log.d(TAG, "openServer: $server")
-                    navController.navigate("serverFilesScreen")
+                    serverNavController.navigate(ServersDestinations.SERVER_FILES)
                 } else {
                     _selectSmbServer.value = null
                 }

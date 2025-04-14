@@ -30,7 +30,7 @@ import com.aidaole.infuseandroid.ui.widgets.MainScreenTitle
     androidx.compose.foundation.ExperimentalFoundationApi::class
 )
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(mainNavController: NavHostController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
