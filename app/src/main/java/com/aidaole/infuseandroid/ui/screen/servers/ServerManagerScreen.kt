@@ -64,7 +64,10 @@ fun ServerManageScreen() {
             )
         }
         composable("addSmbServer") {
-            AddSmbServerScreen()
+            AddSmbServerScreen(
+                onBackClick = { navController.popBackStack() },
+                onAddServerClick = { navController.popBackStack() }
+            )
         }
     }
 }

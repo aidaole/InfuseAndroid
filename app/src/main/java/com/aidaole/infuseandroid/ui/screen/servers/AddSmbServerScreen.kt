@@ -38,13 +38,19 @@ import com.aidaole.infuseandroid.ui.widgets.SubScreenTitle
 @Preview
 @Composable
 fun preivew() {
-    AddSmbServerScreen(ServerManageViewModel(SmbRepositoryFake()))
+    AddSmbServerScreen(
+        ServerManageViewModel(SmbRepositoryFake()),
+        onBackClick = {},
+        onAddServerClick = {}
+    )
 }
 
 @OptIn(ExperimentalTvMaterial3Api::class)
 @Composable
 fun AddSmbServerScreen(
-    serverManageViewModel: ServerManageViewModel = hiltViewModel()
+    serverManageViewModel: ServerManageViewModel = hiltViewModel(),
+    onBackClick: () -> Unit = {},
+    onAddServerClick: () -> Unit = {}
 ) {
     var name by remember { mutableStateOf("") }
     var host by remember { mutableStateOf("192.168.31.191") }
@@ -62,7 +68,9 @@ fun AddSmbServerScreen(
             Icon(Icons.Outlined.ArrowBackIosNew,
                 contentDescription = "Back",
                 Modifier
-                    .clickable { }
+                    .clickable {
+                        onBackClick.invoke()
+                    }
                     .padding(10.dp)
             )
             SubScreenTitle(
@@ -105,6 +113,7 @@ fun AddSmbServerScreen(
                 serverManageViewModel.addServer(
                     name, host, username, password
                 )
+                onAddServerClick.invoke()
             }) {
             Text("新增")
         }
