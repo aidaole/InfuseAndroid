@@ -40,7 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.aidaole.infuseandroid.ui.screen.home.HomeScreen
 import com.aidaole.infuseandroid.ui.screen.search.SearchScreen
 import com.aidaole.infuseandroid.ui.screen.servers.ServersNavGraph
-import com.aidaole.infuseandroid.ui.screen.settings.SettingScreen
+import com.aidaole.infuseandroid.ui.screen.settings.SettingNavGraph
 import com.aidaole.infuseandroid.ui.theme.Orange
 
 object MainScreenDestinations {
@@ -67,13 +67,13 @@ fun MainNavGraph(appNavController: NavHostController) {
                 HomeScreen(mainNavController)
             }
             composable(MainScreenDestinations.SEARCH) {
-                SearchScreen()
+                SearchScreen(mainNavController)
             }
             composable(MainScreenDestinations.SERVER) {
                 ServersNavGraph(mainNavController)
             }
             composable(MainScreenDestinations.SETTINGS) {
-                SettingScreen()
+                SettingNavGraph(mainNavController)
             }
         }
     }
