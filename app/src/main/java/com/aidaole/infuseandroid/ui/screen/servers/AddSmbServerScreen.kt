@@ -47,9 +47,9 @@ fun AddSmbServerScreen(
     serverManageViewModel: ServerManageViewModel = hiltViewModel()
 ) {
     var name by remember { mutableStateOf("") }
-    var host by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
+    var host by remember { mutableStateOf("192.168.31.191") }
+    var username by remember { mutableStateOf("username") }
+    var password by remember { mutableStateOf("password") }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -83,17 +83,17 @@ fun AddSmbServerScreen(
             onValueChange = { name = it })
 
         HorizonInputWidget(name = "ip",
-            inputContent = "192.168.30.1",
+            inputContent = host,
             inputAble = true,
             onValueChange = { host = it })
 
         HorizonInputWidget(name = "用户名",
-            inputContent = "johappessed",
+            inputContent = username,
             inputAble = true,
             onValueChange = { username = it })
 
         HorizonInputWidget(name = "密码",
-            inputContent = "密码",
+            inputContent = password,
             inputAble = true,
             onValueChange = { password = it })
 
@@ -109,7 +109,7 @@ fun AddSmbServerScreen(
             Text("新增")
         }
 
-        Spacer(modifier = Modifier.height(160.dp))
+        Spacer(modifier = Modifier.height(300.dp))
     }
 }
 
