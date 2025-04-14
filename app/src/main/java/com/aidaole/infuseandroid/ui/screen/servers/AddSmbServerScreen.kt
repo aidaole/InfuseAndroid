@@ -1,6 +1,5 @@
 package com.aidaole.infuseandroid.ui.screen.servers
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,11 +11,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,13 +23,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.tv.material3.ExperimentalTvMaterial3Api
 import androidx.tv.material3.Icon
-import androidx.tv.material3.IconButton
 import androidx.tv.material3.Text
 import com.aidaole.infuseandroid.data.repository.SmbRepositoryFake
 import com.aidaole.infuseandroid.ui.widgets.SubScreenTitle
@@ -97,15 +97,19 @@ fun AddSmbServerScreen(
             inputAble = true,
             onValueChange = { password = it })
 
-        Button(onClick = {
-            serverManageViewModel.addServer(
-                name, host, username, password
-            )
-        }) {
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp),
+            onClick = {
+                serverManageViewModel.addServer(
+                    name, host, username, password
+                )
+            }) {
             Text("新增")
         }
 
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(160.dp))
     }
 }
 
@@ -128,12 +132,12 @@ fun HorizonInputWidget(
             name, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(2F)
         )
         if (inputAble) {
-            OutlinedTextField(
+            TransparentInputField(
                 value = inputContent,
-                modifier = Modifier.weight(5F),
-                onValueChange = {
-                    onValueChange(it)
-                },
+                modifier = Modifier
+                    .weight(5F)
+                    .padding(vertical = 10.dp),
+                onValueChange = onValueChange
             )
         } else {
             Text(
@@ -146,4 +150,27 @@ fun HorizonInputWidget(
         }
 
     }
+}
+
+@Composable
+fun TransparentInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    BasicTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        textStyle = TextStyle(
+            color = MaterialTheme.colorScheme.onBackground,
+            fontSize = 16.sp
+        ),
+        singleLine = true,
+        cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+        decorationBox = { innerTextField ->
+            // 你可以在这里加 placeholder 等
+            innerTextField()
+        }
+    )
 }
