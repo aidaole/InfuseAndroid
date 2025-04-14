@@ -6,33 +6,28 @@ import com.aidaole.infuseandroid.data.model.FileItem
 import com.aidaole.infuseandroid.data.model.SmbServer
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 
 class SmbRepositoryFake @Inject constructor() : SmbRepository {
 
-    private val servers = mutableListOf<SmbServer>()
+    private val _servers = MutableStateFlow<List<SmbServer>>(emptyList())
+    private val servers: Flow<List<SmbServer>> = _servers.asStateFlow()
 
     override fun getServers(): Flow<List<SmbServer>> {
-        return flow {
-            emit(
-                listOf(
-                    SmbServer("0", "mac", "192.168.1.1", "y", "x", true)
-                )
-            )
-        }
+        return servers
     }
 
     override suspend fun addServer(server: SmbServer) {
-        servers.add(server)
+        _servers.value += server
     }
 
     @RequiresApi(Build.VERSION_CODES.N)
     override suspend fun removeServer(serverId: String) {
-        servers.removeIf {
-            it.id == serverId
-        }
+        _servers.value = _servers.value.filter { it.id != serverId }
     }
 
     override suspend fun connectToServer(server: SmbServer): Boolean {
