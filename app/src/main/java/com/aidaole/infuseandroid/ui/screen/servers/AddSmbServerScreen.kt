@@ -52,7 +52,7 @@ fun AddSmbServerScreen(
     onBackClick: () -> Unit = {},
     onAddServerClick: () -> Unit = {}
 ) {
-    var name by remember { mutableStateOf("") }
+    var name by remember { mutableStateOf("我的SMB") }
     var host by remember { mutableStateOf("192.168.31.191") }
     var username by remember { mutableStateOf("username") }
     var password by remember { mutableStateOf("password") }
@@ -86,7 +86,7 @@ fun AddSmbServerScreen(
 
         HorizonInputWidget(
             name = "名称",
-            inputContent = "我的SMB",
+            inputContent = name,
             inputAble = true,
             onValueChange = { name = it })
 
